@@ -4,17 +4,11 @@ import sys
 
 import pygame
 
-from .entities import Snake, Fruit
+from .entities import Direction, Fruit, Point, Snake, Colors
+
 
 # Initialize Pygame
 pygame.init()
-
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-
 
 class SnakeGame():
     """The Snake Game.
@@ -33,24 +27,33 @@ class SnakeGame():
 
         self.screen = pygame.display.set_mode((self.width, self.height), 0, 32)
         self.surface = pygame.Surface(self.screen.get_size()).convert()
-        
+
         self.reset()
 
-    def run(self):
-        """Runs the game."""
+    def play(self):
+        """Starts the game."""
         clock = pygame.time.Clock()
-
+        current_action = Direction.RIGHT
+        
         while True:
-            self.handle_events()
-            self.update_entities()
+            user_action = self.get_action()
+            current_action = user_action if user_action else current_action
+            self.play_action(current_action)
+
             self.update_screen()
             self.update_score()
             clock.tick(self.fps)
 
-    def update_entities(self) -> None:
-        """Updates the entities."""
-        self.snake.move()
-        if self.snake.head() == self.fruit.position:
+    def play_step(self, action: Direction) -> tuple[float, bool, int]:
+        """Plays a step in the game."""
+        self.play_action(action)
+        self.update_screen()
+        self.update_score()
+
+    def play_action(self, action: Direction) -> None:
+        """Plays an action in the game."""
+        self.snake.move(action)
+        if self.snake.head() == self.fruit.position():
             self.snake.eat()
             self.spawn_fruit()
             self.score += 1
@@ -62,40 +65,44 @@ class SnakeGame():
             self.snake.head()[1] < 0 or self.snake.head()[1] > self.height - self.cell_size):
             self.reset()
 
+    def spawn_snake(self) -> None:
+        """Spawns a snake."""
+        self.snake = Snake(length=3, starting_position=Point(self.width // 2, self.height // 2))
+
     def spawn_fruit(self) -> None:
         """Spawns a fruit."""
         while True:
-            fruit_position = (random.randint(0, self.width // self.cell_size - 1) * self.cell_size, random.randint(0, self.height // self.cell_size - 1) * self.cell_size)
-            if fruit_position not in self.snake.segments:
+            fruit_position = Point(random.randint(0, self.width // self.cell_size - 1) * self.cell_size, random.randint(0, self.height // self.cell_size - 1) * self.cell_size)
+            if fruit_position not in self.snake.segments():
                 break
             
         self.fruit = Fruit(fruit_position, self.cell_size)
 
-    def handle_events(self) -> None:
+    def get_action(self) -> None:
         """Handles events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    self.snake.change_direction("up")
-                elif event.key == pygame.K_DOWN:
-                    self.snake.change_direction("down")
-                elif event.key == pygame.K_LEFT:
-                    self.snake.change_direction("left")
-                elif event.key == pygame.K_RIGHT:
-                    self.snake.change_direction("right")
+                    return Direction.UP
+                if event.key == pygame.K_DOWN:
+                    return Direction.DOWN
+                if event.key == pygame.K_LEFT:
+                    return Direction.LEFT
+                if event.key == pygame.K_RIGHT:
+                    return Direction.RIGHT
 
     def reset(self) -> None:
         """Resets the game."""
-        self.snake = Snake(3, (self.width // 2, self.height // 2), "right", color=BLUE)
-        self.fruit = Fruit((random.randint(0, self.width // self.cell_size - 1) * self.cell_size, random.randint(0, self.height // self.cell_size - 1) * self.cell_size), self.cell_size, color=RED)
+        self.spawn_snake()
+        self.spawn_fruit()
         self.score = 0
 
     def update_screen(self) -> None:
         """Updates the screen."""
-        self.surface.fill(BLACK)
+        self.surface.fill(Colors.BLACK.value)
         self.draw_grid()
         self.snake.render(self.surface)
         self.fruit.render(self.surface)
@@ -110,4 +117,4 @@ class SnakeGame():
         for y in range(0, self.height, self.cell_size):
             for x in range(0, self.width, self.cell_size):
                 rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
-                pygame.draw.rect(self.surface, WHITE, rect, 1)
+                pygame.draw.rect(self.surface, Colors.WHITE.value, rect, 1)
