@@ -8,9 +8,8 @@ FPS = 10
 
 def main():
     game = SnakeGame(WIDTH, HEIGHT, CELL_SIZE, FPS)
-    game.run()
+    game.play()
 
 
 if __name__ == "__main__":
     main()
-    
