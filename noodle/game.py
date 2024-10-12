@@ -5,39 +5,46 @@ from enum import Enum
 
 import pygame
 
-from .entities import Colors, Direction, Fruit, Point, Snake, Action
 from neural.state import get_state
+
+from .entities import Action, Colors, Direction, Fruit, Point, Snake
 
 # Initialize Pygame
 pygame.init()
 
+
 class GameState(Enum):
     """Enum class for the game states."""
+
     IDLE = 0
     PLAYING = 1
 
-class SnakeGame():
+
+class SnakeGame:
     """The Snake Game.
-    
+
     Attributes:
         width: The width of the game.mamba
         height: The height of the game.
         cell_size: The size of each cell.
         fps: The FPS of the game.
     """
-    def __init__(self, width: int, height: int, cell_size: int, fps: int) -> None:
+
+    def __init__(
+        self, width: int, height: int, cell_size: int, fps: int
+    ) -> None:
         self.width = width
         self.height = height
         self.cell_size = cell_size
         self.fps = fps
 
         self.screen = pygame.display.set_mode((self.width, self.height), 0, 32)
-        self.surface = pygame.Surface(self.screen.get_size()).convert() 
+        self.surface = pygame.Surface(self.screen.get_size()).convert()
         self.clock = pygame.time.Clock()
 
         self.state = GameState.IDLE
         self.snake = None
-        self.fruit = None   
+        self.fruit = None
         self.score = 0
         self.turns = 0
         self.turns_since_eat = 0
@@ -60,7 +67,7 @@ class SnakeGame():
             final_score = self.score
             self.reset()
             return self.state, final_score
-        
+
         self.update_screen()
         self.update_score()
         self.turns += 1
@@ -72,7 +79,7 @@ class SnakeGame():
         """Plays an action in the game."""
         self.state = GameState.PLAYING
         self.snake.move(action)
-        
+
         if self.snake.head() == self.fruit.position():
             self.snake.eat()
             self.spawn_fruit()
@@ -82,24 +89,35 @@ class SnakeGame():
         """Returns a boolean indicating if the given position is a collision."""
         if position in self.snake.segments()[1:]:
             return True
-        
-        if (position.x < 0 or position.x > self.width - self.cell_size or 
-            position.y < 0 or position.y > self.height - self.cell_size):
+
+        if (
+            position.x < 0
+            or position.x > self.width - self.cell_size
+            or position.y < 0
+            or position.y > self.height - self.cell_size
+        ):
             return True
-        
+
         return False
 
     def spawn_snake(self) -> None:
         """Spawns a snake."""
-        self.snake = Snake(length=3, starting_position=Point(self.width // 2, self.height // 2))
+        self.snake = Snake(
+            length=3, starting_position=Point(self.width // 2, self.height // 2)
+        )
 
     def spawn_fruit(self) -> None:
         """Spawns a fruit."""
         while True:
-            fruit_position = Point(random.randint(0, self.width // self.cell_size - 1) * self.cell_size, random.randint(0, self.height // self.cell_size - 1) * self.cell_size)
+            fruit_position = Point(
+                random.randint(0, self.width // self.cell_size - 1)
+                * self.cell_size,
+                random.randint(0, self.height // self.cell_size - 1)
+                * self.cell_size,
+            )
             if fruit_position not in self.snake.segments():
                 break
-            
+
         self.fruit = Fruit(fruit_position, self.cell_size)
 
     def get_user_action(self) -> Action:
@@ -108,17 +126,23 @@ class SnakeGame():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            
+
             snake_direction = self.snake.direction()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     return Action.from_direction(snake_direction, Direction.UP)
                 elif event.key == pygame.K_RIGHT:
-                    return Action.from_direction(snake_direction, Direction.RIGHT)
+                    return Action.from_direction(
+                        snake_direction, Direction.RIGHT
+                    )
                 elif event.key == pygame.K_DOWN:
-                    return Action.from_direction(snake_direction, Direction.DOWN)
+                    return Action.from_direction(
+                        snake_direction, Direction.DOWN
+                    )
                 elif event.key == pygame.K_LEFT:
-                    return Action.from_direction(snake_direction, Direction.LEFT)
+                    return Action.from_direction(
+                        snake_direction, Direction.LEFT
+                    )
 
     def reset(self) -> None:
         """Resets the game."""
