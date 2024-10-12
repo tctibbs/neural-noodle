@@ -1,0 +1,61 @@
+{
+    // Set the Python language server to Pylance for enhanced IntelliSense and type checking.
+    "python.languageServer": "Pylance",
+
+    // Set the type checking mode for Python. 
+    // Options: "off", "basic" (default), or "strict".
+    // "basic" checks for common type errors, while "strict" is more thorough.
+    "python.analysis.typeCheckingMode": "basic",
+
+    // Enable auto-import completions in IntelliSense to automatically add import statements.
+    "python.analysis.autoImportCompletions": true,
+
+    // Display inlay hints for inferred variable types in the editor.
+    "python.analysis.inlayHints.variableTypes": true,
+
+    // Display inlay hints for inferred function return types in the editor.
+    "python.analysis.inlayHints.functionReturnTypes": true,
+
+    // Show argument names in inlay hints for function/method calls.
+    // "partial" shows names for some arguments, "all" shows names for all.
+    "python.analysis.inlayHints.callArgumentNames": "all",
+
+    // Enable inlay hints for pytest test function parameters.
+    "python.analysis.inlayHints.pytestParameters": true,
+
+    // Automatically format strings according to PEP 8 standards.
+    "python.analysis.autoFormatStrings": true,
+
+    // Enable support for reStructuredText (.rst) in docstrings and files.
+    "python.analysis.supportRestructuredText": true,
+
+    // Limit the number of reported diagnostics (helps performance on large projects).
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportGeneralTypeIssues": "information"
+    },
+    
+    // Automatically detect the Python interpreter (virtual environments).
+    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+
+    // Pylance-specific settings to enhance performance.
+    "python.analysis.diagnosticMode": "openFilesOnly",  // Analyze only open files for better performance.
+    "python.analysis.autoSearchPaths": true,  // Automatically add search paths based on module imports.
+
+    // Python-specific editor settings
+    "[python]": {
+        // Use "ruff" as the default formatter for Python code.
+        "editor.defaultFormatter": "charliermarsh.ruff",
+
+        // Automatically format the file on save using the configured formatter.
+        "editor.formatOnSave": true
+    },
+
+    // Enable pytest for running tests and specify the directory where tests are located.
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["tests"],
+
+    // Automatically apply fixes provided by source code actions (including linting with Ruff).
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "always"
+    }
+}
