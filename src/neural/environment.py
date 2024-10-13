@@ -1,11 +1,13 @@
 """Snake Game wrapper over Gymnasium environment."""
+import copy
+
 import gymnasium as gym
 import numpy as np
 import pygame
 from gymnasium import spaces
 
 from src.noodle import Controller, Model, View
-from src.noodle.model import Action, Point
+from src.noodle.model import Direction
 
 
 class SnakeGameEnv(gym.Env):
@@ -29,7 +31,9 @@ class SnakeGameEnv(gym.Env):
 
         self.model: Model = Model(self.width, self.height, self.cell_size)
         self.view: View = View(self.width, self.height, self.cell_size)
-        self.action_space: gym.Space = spaces.Discrete(3)
+
+        # Action space: 0 - UP, 1 - RIGHT, 2 - DOWN, 3 - LEFT
+        self.action_space: gym.Space = spaces.Discrete(4)
 
         # Observation space includes:
         # 1. Direction (0: UP, 1: RIGHT, 2: DOWN, 3: LEFT)
@@ -59,44 +63,46 @@ class SnakeGameEnv(gym.Env):
         Apply action, update the game state,
         and return the necessary Gym output.
         """
-        # Convert gym action (0, 1, 2) to game Action
+        # Update direction based on action (0: UP, 1: RIGHT, 2: DOWN, 3: LEFT)
         if action == 0:
-            action_enum = Action.MOVE_LEFT
+            direction = Direction.UP
         elif action == 1:
-            action_enum = Action.MOVE_RIGHT
-        else:
-            action_enum = Action.MOVE_STRAIGHT
+            direction = Direction.RIGHT
+        elif action == 2:
+            direction = Direction.DOWN
+        elif action == 3:
+            direction = Direction.LEFT
 
-        score, done = self.model.play_step(action_enum)
+        prev_state = copy.deepcopy(self.model.state)
+        curr_state = self.model.play_step(direction)
         obs = self._get_observation()
-        truncated = False
 
+        truncated = False
+        terminated = False
         # Game over if collision occurs
-        if done:
-            reward = -10
+        if curr_state.done:
+            reward = -10.0
             terminated = True
         # Game over if snake hasn't eaten for 50 turns (time truncation)
-        elif self.model.metrics.turns_since_ate >= 50:
+        elif curr_state.turns_since_ate >= 50:
             print("Game over: 50 turns without eating.")
-            reward = -10
+            reward = -10.0
             terminated = True
             truncated = True
         # Reward for eating
-        elif self.model.snake.head() == self.model.fruit.position():
-            reward = 10
-            terminated = False
-        # Penalty for each step (to encourage quicker gameplay)
+        elif curr_state.fruits_eaten > prev_state.fruits_eaten:
+            reward = 10.0
         else:
-            reward = -1
-            terminated = False
+            reward = 1
 
         info = {}
 
         # Debugging output to track actions and game state
         print(
             f"Action: {action}, Reward: {reward}"
-            + f", Turns since ate: {self.model.metrics.turns_since_ate}"
-            + f", Done: {done}"
+            + f", Turns since ate: {curr_state.turns_since_ate}"
+            + f", Done: {curr_state.done}"
+            + f", Fruits eaten: {curr_state.fruits_eaten}"
         )
 
         return obs, reward, terminated, truncated, info
@@ -104,7 +110,7 @@ class SnakeGameEnv(gym.Env):
     def render(self, mode: str = "human") -> None:
         """Render the game state."""
         self.view.render(
-            self.model.snake, self.model.fruit, self.model.metrics.score
+            self.model.snake, self.model.fruit, self.model.state.score
         )
 
     def close(self) -> None:
@@ -117,15 +123,26 @@ class SnakeGameEnv(gym.Env):
             self.model.snake.direction().value
         )  # 0: UP, 1: RIGHT, 2: DOWN, 3: LEFT
         distances_to_danger = self._get_distances_to_danger()
-        distance_to_fruit = self._manhattan_distance(
-            self.model.snake.head(), self.model.fruit.position()
-        )
+        distance_to_fruit = self.model.state.distance_to_fruit
 
-        # Return as a 1D array (6 values)
-        return np.array(
+        observation = np.array(
             [direction] + distances_to_danger + [distance_to_fruit],
             dtype=np.float32,
         )
+
+        # Human-readable printout of the observation with consistent spacing
+        direction_labels = ["UP", "RIGHT", "DOWN", "LEFT"]
+        print(
+            f"{'Direction:':<10} {direction_labels[direction]:<6}"
+            f"{'Distance to danger:':<20}"
+            f"{'Up':<3}{distances_to_danger[0]:<3.0f} "
+            f"{'Right':<6}{distances_to_danger[1]:<3.0f} "
+            f"{'Down':<5}{distances_to_danger[2]:<3.0f} "
+            f"{'Left':<5}{distances_to_danger[3]:<3.0f}"
+            f"{'Distance to fruit:':<18} {distance_to_fruit:.0f}"
+        )
+
+        return observation
 
     def _get_distances_to_danger(self) -> list[float]:
         """
@@ -166,7 +183,3 @@ class SnakeGameEnv(gym.Env):
             float(distance_down),
             float(distance_left),
         ]
-
-    def _manhattan_distance(self, p1: Point, p2: Point) -> float:
-        """Calculate the Manhattan distance between two points."""
-        return abs(p1.x - p2.x) + abs(p1.y - p2.y)

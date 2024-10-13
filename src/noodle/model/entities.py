@@ -33,36 +33,6 @@ class Direction(Enum):
     DOWN = 2
     LEFT = 3
 
-    def move_left(self) -> Direction:
-        """Returns the direction after moving left."""
-        return Direction(self.value - 1 if self.value > 0 else 3)
-
-    def move_right(self) -> Direction:
-        """Returns the direction after moving right."""
-        return Direction(self.value + 1 if self.value < 3 else 0)
-
-
-class Action(Enum):
-    """Enum class for the actions."""
-
-    MOVE_STRAIGHT = 0
-    MOVE_LEFT = 1
-    MOVE_RIGHT = 2
-
-    @staticmethod
-    def from_direction(
-        current_direction: Direction, desired_direction: Direction
-    ) -> Action:
-        """Returns the action from the given direction."""
-        if desired_direction == current_direction:
-            return Action.MOVE_STRAIGHT
-        elif desired_direction == current_direction.move_left():
-            return Action.MOVE_LEFT
-        elif desired_direction == current_direction.move_right():
-            return Action.MOVE_RIGHT
-        else:
-            return Action.MOVE_STRAIGHT
-
 
 class Snake:
     """Snake entity.
@@ -89,6 +59,22 @@ class Snake:
         """Returns the direction of the snake."""
         return self._direction
 
+    def set_direction(self, direction: Direction) -> None:
+        """Sets the new direction of the snake, if possible."""
+        if (
+            (self._direction == Direction.UP and direction != Direction.DOWN)
+            or (self._direction == Direction.DOWN and direction != Direction.UP)
+            or (
+                self._direction == Direction.LEFT
+                and direction != Direction.RIGHT
+            )
+            or (
+                self._direction == Direction.RIGHT
+                and direction != Direction.LEFT
+            )
+        ):
+            self._direction = direction
+
     def head(self) -> Point:
         """Returns the head of the snake."""
         return self._segments[0]
@@ -109,15 +95,8 @@ class Snake:
         """Returns the number of turns since the snake last ate."""
         return self._turns_since_eat
 
-    def move(self, action: Action) -> None:
-        """Moves the snake in the specified direction."""
-        if action == Action.MOVE_STRAIGHT:
-            self._direction = self._direction
-        elif action == Action.MOVE_LEFT:
-            self._direction = self._direction.move_left()
-        elif action == Action.MOVE_RIGHT:
-            self._direction = self._direction.move_right()
-
+    def move(self) -> None:
+        """Moves the snake based on its current direction."""
         x_delta = 0
         y_delta = 0
         if self._direction == Direction.UP:
@@ -130,14 +109,14 @@ class Snake:
             x_delta = -self._size
 
         current_head = self.head()
-        self._segments.appendleft(
-            Point(current_head.x + x_delta, current_head.y + y_delta)
-        )
+        new_head = Point(current_head.x + x_delta, current_head.y + y_delta)
+
+        self._segments.appendleft(new_head)
         if len(self._segments) > self._length:
             self._segments.pop()
 
     def eat(self) -> None:
-        """Makes the snake eat."""
+        """Increases the snake's length after eating."""
         self._length += 1
         self._turns_since_eat = 0
 

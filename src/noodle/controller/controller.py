@@ -4,7 +4,7 @@ import sys
 import pygame
 
 from src.noodle import Model, View
-from src.noodle.model import Action, Direction
+from src.noodle.model import Direction
 
 
 class Controller:
@@ -19,38 +19,33 @@ class Controller:
     def play(self):
         """Main game loop, handles user input and updates the game state."""
         while True:
-            action = self.get_user_action()
-            metrics, done = self.model.play_step(action)
+            direction = self.get_user_action()
+            curr_state = self.model.play_step(direction)
 
-            self.view.render(self.model.snake, self.model.fruit, metrics.score)
+            self.view.render(
+                self.model.snake, self.model.fruit, curr_state.score
+            )
 
-            if done:
+            if curr_state.done:
                 self.model.reset()
 
             self.clock.tick(self.fps)
 
-    def get_user_action(self) -> Action:
+    def get_user_action(self) -> Direction:
         """Handles player input (keyboard or AI)."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            snake_direction = self.model.snake.direction()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    return Action.from_direction(snake_direction, Direction.UP)
+                    return Direction.UP
                 elif event.key == pygame.K_RIGHT:
-                    return Action.from_direction(
-                        snake_direction, Direction.RIGHT
-                    )
+                    return Direction.RIGHT
                 elif event.key == pygame.K_DOWN:
-                    return Action.from_direction(
-                        snake_direction, Direction.DOWN
-                    )
+                    return Direction.DOWN
                 elif event.key == pygame.K_LEFT:
-                    return Action.from_direction(
-                        snake_direction, Direction.LEFT
-                    )
+                    return Direction.LEFT
 
-        return Action.MOVE_STRAIGHT
+        return self.model.snake.direction()

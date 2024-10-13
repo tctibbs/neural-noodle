@@ -1,15 +1,24 @@
 import random
 from dataclasses import dataclass
 
-from . import Action, Fruit, Point, Snake
+import numpy as np
+
+from src.noodle.model.entities import Direction
+
+from . import Fruit, Point, Snake
 
 
 @dataclass
-class Metrics:
+class GameState:
     """Keeps track of game metrics."""
 
+    done: bool = False
     score: int = 0
+    steps_taken: int = 0
     turns_since_ate: int = 0
+    fruits_eaten: int = 0
+    distance_to_fruit: float = np.inf
+    moves_per_fruit: float = np.inf
 
 
 class Model:
@@ -26,22 +35,19 @@ class Model:
         """Resets the game state and metrics."""
         self.spawn_snake()
         self.spawn_fruit()
-        self.metrics = Metrics()
+        self.state = GameState()
 
-    def play_step(self, action: Action) -> tuple[Metrics, bool]:
+    def play_step(self, direction: Direction) -> GameState:
         """Updates the game state based on the player's action."""
-        self.snake.move(action)
+        self.snake.set_direction(direction)
+        self.snake.move()
 
+        self._update_game_state()
         if self.snake.head() == self.fruit.position():
             self.snake.eat()
             self.spawn_fruit()
-            self.metrics.score += 1
-            self.metrics.turns_since_ate = 0  # Reset after eating
-        else:
-            self.metrics.turns_since_ate += 1  # Increment when not eating
 
-        done = self.check_collision(self.snake.head())
-        return self.metrics, done
+        return self.state
 
     def check_collision(self, position: Point) -> bool:
         """Checks if the snake has collided with itself or the walls."""
@@ -86,3 +92,34 @@ class Model:
         """Returns the fruit object."""
         assert self._fruit is not None, "Fruit has not been initialized"
         return self._fruit
+
+    def _update_game_state(self) -> None:
+        """Updates the game state."""
+        self.state.steps_taken += 1
+
+        if self.check_collision(self.snake.head()):
+            self.state.done = True
+        elif self.snake.head() == self.fruit.position():
+            self.state.score += 1
+            self.state.turns_since_ate = 0
+            self.state.fruits_eaten += 1
+
+            self.state.moves_per_fruit = (
+                self.state.steps_taken / self.state.fruits_eaten
+            )
+
+        else:
+            self.state.turns_since_ate += 1
+
+        self.state.distance_to_fruit = (
+            _manhattan_distance(
+                self.snake.head(),
+                self.fruit.position(),
+            )
+            // self.cell_size
+        )
+
+
+def _manhattan_distance(p1: Point, p2: Point) -> float:
+    """Returns the Manhattan distance between two points."""
+    return abs(p1.x - p2.x) + abs(p1.y - p2.y)
