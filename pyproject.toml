@@ -1,10 +1,10 @@
 [tool.poetry]
-# Name and version of the library.
-name = "python_template"
+# Name and version of the project.
+name = "neural-noodle"
 version = "0.1.0"
 
 # Short description of the project.
-description = "A Python template library for reusable Python project setups."
+description = "A reinforcement learning-based Snake game called Neural Noodle."
 
 # Author information.
 authors = ["Tristan Tibbs <tristantibbs@gmail.com>"]
@@ -15,25 +15,28 @@ license = "MIT"
 # Path to the README file for project documentation.
 readme = "README.md"
 
-# Specify where the package is located in the repository.
+# Specify where the packages are located in the repository.
 packages = [
-    { include = "python_template", from = "src" }
+    { include = "neural", from = "src" },
+    { include = "noodle", from = "src" }
 ]
 
-# Production dependencies (none in this example, add here if needed).
+# Production dependencies.
 [tool.poetry.dependencies]
-python = "^3.10" # Required Python version.
-
-# Development dependencies, not required in production.
+python = "^3.10"
 pygame = "^2.6.1"
-numpy = "^2.1.2"
+numpy = "^1.21.0"
 torch = "^2.4.1"
 matplotlib = "^3.9.2"
 ipython = "^8.28.0"
+gymnasium = ">=0.28.1,<0.30"
+stable-baselines3 = "^2.3.2"
+
+# Development dependencies.
 [tool.poetry.dev-dependencies]
-ruff = "^0.1.14"    # Ruff: A linter and code formatter.
-pytest = "^7.4.4"   # Pytest: A testing framework for running unit tests.
-mypy = "^1.8.0"     # Mypy: A static type checker for enforcing type annotations.
+ruff = "^0.1.14"
+pytest = "^7.4.4"
+mypy = "^1.8.0"
 
 # Poetry build system requirements.
 [build-system]
@@ -42,20 +45,13 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.mypy]
-enable_incomplete_feature = ["NewGenericSyntax"]    # Enable experimental features in Mypy, such as new syntax.
-strict = true                                       # Enforce strict type checking to catch potential issues early.
+enable_incomplete_feature = ["NewGenericSyntax"]
+strict = true
 
 [tool.ruff]
-line-length = 80    # Set the maximum line length (80 is the default based on PEP 8).
-indent-width = 4    # Number of spaces for indentation (default is 4 spaces).
-
-# Exclude `__init__.py` files from automatic formatting.
+line-length = 80
+indent-width = 4
 exclude = ["**/__init__.py"]
 
-# E: Enforces PEP 8 errors (syntax or structural errors in the code).
-# F: Enforces Pyflakes rules for catching unused imports and variables.
-# I: Enforces proper import sorting and grouping (compatible with isort).
-# N: Enforces naming convention rules for variables, functions, and classes.
-# Q: Enforces consistent usage of single or double quotes.
-# W: Enables general warnings for non-standard Python usage.
+# Linting rules
 select = ["E", "F", "I", "N", "Q", "W"]

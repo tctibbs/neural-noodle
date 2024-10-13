@@ -3,8 +3,8 @@ import sys
 
 import pygame
 
-from noodle import Model, View
-from noodle.model import Action, Direction
+from src.noodle import Model, View
+from src.noodle.model import Action, Direction
 
 
 class Controller:
@@ -20,9 +20,9 @@ class Controller:
         """Main game loop, handles user input and updates the game state."""
         while True:
             action = self.get_user_action()
-            score, done = self.model.play_step(action)
+            metrics, done = self.model.play_step(action)
 
-            self.view.render(self.model.snake, self.model.fruit, score)
+            self.view.render(self.model.snake, self.model.fruit, metrics.score)
 
             if done:
                 self.model.reset()

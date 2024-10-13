@@ -1,7 +1,6 @@
 import argparse
 
-# from neural.agent import train
-from noodle import Controller, Model, View
+from src.noodle import Controller, Model, View
 
 # Constants
 WIDTH, HEIGHT = 400, 400

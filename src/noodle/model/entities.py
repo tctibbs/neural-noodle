@@ -61,7 +61,6 @@ class Action(Enum):
         elif desired_direction == current_direction.move_right():
             return Action.MOVE_RIGHT
         else:
-            # Default to moving straight if a desired action is not possible
             return Action.MOVE_STRAIGHT
 
 
@@ -119,7 +118,6 @@ class Snake:
         elif action == Action.MOVE_RIGHT:
             self._direction = self._direction.move_right()
 
-        print(f"Moving snake {self._direction}")
         x_delta = 0
         y_delta = 0
         if self._direction == Direction.UP:

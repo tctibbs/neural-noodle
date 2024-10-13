@@ -4,7 +4,7 @@ from enum import Enum
 
 import pygame
 
-from noodle.model import Fruit, Snake
+from src.noodle.model import Fruit, Snake
 
 
 class View:
