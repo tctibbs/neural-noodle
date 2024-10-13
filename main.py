@@ -6,7 +6,7 @@ from noodle import Controller, Model, View
 # Constants
 WIDTH, HEIGHT = 400, 400
 CELL_SIZE = 25
-FPS = 120
+FPS = 15
 
 
 def main():
