@@ -1,10 +1,12 @@
 import random
 from collections import deque  # data structure to store memory
 
+import matplotlib.pyplot as plt
 import torch  # pytorch
+from IPython import display
 
-from noodle.entities import Action
 from noodle.game import GameState, SnakeGame
+from noodle.model import Action
 
 from .model import Linear_QNet
 from .state import get_state, get_state_size
@@ -98,9 +100,6 @@ class Agent:
         action = torch.argmax(prediction).item()
         return action
 
-
-import matplotlib.pyplot as plt
-from IPython import display
 
 plt.ion()
 

@@ -1,8 +1,7 @@
 """State module"""
-# from noodle.game import SnakeGame
 import numpy as np
 
-from noodle.entities import Direction, Point
+from noodle.model import Direction, Point
 
 
 def get_state(game) -> np.ndarray:

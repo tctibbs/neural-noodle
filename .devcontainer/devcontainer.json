@@ -14,37 +14,17 @@
     // Customizations for the development environment, specifically for VSCode
     "customizations": {
         "vscode": {
-            // VSCode settings specific to the dev container
-            "settings": {},
-
             // Extensions to automatically install when the container is launched
             "extensions": [
-                // Python-specific linter and formatter
                 "charliermarsh.ruff",
-
-                // Allows running code snippets in many different languages, including Python
                 "formulahendry.code-runner",
-
-                // Adapter for Python testing, integrates various Python test frameworks
                 "littlefoxteam.vscode-python-test-adapter",
-
-                // Enhanced Python syntax highlighting and IntelliSense
-                "magicstack.MagicPython",
-
-                // Docker integration for VSCode to manage containers and images
                 "ms-azuretools.vscode-docker",
-
-                // Core Python extension providing IntelliSense, linting, debugging, etc.
                 "ms-python.python",
-
-                // Provides the Pylance language server for Python (fast, highly performant)
                 "ms-python.vscode-pylance",
-
-                // Makefile support for running tasks in VSCode
                 "ms-vscode.makefile-tools",
-
-                // Markdown editor with formatting and preview features
-                "yzhang.markdown-all-in-one"
+                "yzhang.markdown-all-in-one",
+                "tamasfe.even-better-toml"
             ]
         }
     }

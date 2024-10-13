@@ -1,7 +1,7 @@
 import argparse
 
-from neural.agent import train
-from noodle.game import SnakeGame
+# from neural.agent import train
+from noodle import Controller, Model, View
 
 # Constants
 WIDTH, HEIGHT = 400, 400
@@ -9,7 +9,7 @@ CELL_SIZE = 25
 FPS = 120
 
 
-def main(manual=False):
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--manual",
@@ -18,11 +18,15 @@ def main(manual=False):
     )
     args = parser.parse_args()
 
-    game = SnakeGame(WIDTH, HEIGHT, CELL_SIZE, FPS)
+    game_model = Model(width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE)
+    game_view = View(width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE)
+
     if args.manual:
-        game.play()
+        game_controller = Controller(game_model, game_view, FPS)
+        game_controller.play()
     else:
-        train(WIDTH, HEIGHT, CELL_SIZE, FPS)
+        pass
+        # train(game_model, WIDTH, HEIGHT, CELL_SIZE, FPS)
 
 
 if __name__ == "__main__":

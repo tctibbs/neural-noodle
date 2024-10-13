@@ -49,6 +49,9 @@ strict = true                                       # Enforce strict type checki
 line-length = 80    # Set the maximum line length (80 is the default based on PEP 8).
 indent-width = 4    # Number of spaces for indentation (default is 4 spaces).
 
+# Exclude `__init__.py` files from automatic formatting.
+exclude = ["**/__init__.py"]
+
 # E: Enforces PEP 8 errors (syntax or structural errors in the code).
 # F: Enforces Pyflakes rules for catching unused imports and variables.
 # I: Enforces proper import sorting and grouping (compatible with isort).
