@@ -71,7 +71,7 @@ def create_snake_env(
 
 
 def create_dqn_model(
-    env: SnakeGameEnv, buffer_size: int = 500000, learning_rate: float = 1e-3
+    env: SnakeGameEnv, buffer_size: int = 1000000, learning_rate: float = 1e-3
 ) -> DQN:
     """Creates and returns the DQN model for training."""
     policy_kwargs = dict(
@@ -93,7 +93,7 @@ def create_dqn_model(
     )
 
 
-def train_snake_dqn(timesteps: int = 10000) -> None:
+def train_snake_dqn(timesteps: int) -> None:
     """Trains a DQN model on the Snake game and evaluates its performance."""
 
     # Create environment and DQN model
@@ -174,4 +174,4 @@ def evaluate_and_print_results(
 
 
 if __name__ == "__main__":
-    train_snake_dqn(timesteps=50000)
+    train_snake_dqn(timesteps=1000000)
