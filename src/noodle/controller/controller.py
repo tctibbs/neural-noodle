@@ -1,5 +1,7 @@
 """Snake Game Controller."""
+
 import sys
+from typing import NoReturn
 
 import pygame
 
@@ -10,13 +12,13 @@ from src.noodle.model import Direction
 class Controller:
     """Controller for the Snake game, managing input and game flow."""
 
-    def __init__(self, model: Model, view: View, fps: int):
+    def __init__(self, model: Model, view: View, fps: int) -> None:
         self.model = model
         self.view = view
         self.fps = fps
         self.clock = pygame.time.Clock()
 
-    def play(self):
+    def play(self) -> NoReturn:
         """Main game loop, handles user input and updates the game state."""
         while True:
             direction = self.get_user_action()

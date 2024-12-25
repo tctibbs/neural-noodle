@@ -10,14 +10,14 @@ from src.noodle.model import Fruit, Snake
 class View:
     """View for the Snake game, handles rendering."""
 
-    def __init__(self, width: int, height: int, cell_size: int):
+    def __init__(self, width: int, height: int, cell_size: int) -> None:
         self.width = width
         self.height = height
         self.cell_size = cell_size
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.surface = pygame.Surface(self.screen.get_size()).convert()
 
-    def render(self, snake: Snake, fruit: Fruit, score: int):
+    def render(self, snake: Snake, fruit: Fruit, score: int) -> None:
         """Renders the game state onto the screen."""
         self.surface.fill(Colors.BLACK.value)
         self.draw_grid()
@@ -29,14 +29,14 @@ class View:
         # Render score
         pygame.display.set_caption(f"Snake Game - Score: {score}")
 
-    def draw_grid(self):
+    def draw_grid(self) -> None:
         """Draws the grid on the screen."""
         for y in range(0, self.height, self.cell_size):
             for x in range(0, self.width, self.cell_size):
                 rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
                 pygame.draw.rect(self.surface, Colors.WHITE.value, rect, 1)
 
-    def render_snake(self, snake: Snake):
+    def render_snake(self, snake: Snake) -> None:
         """Renders the snake based on its state."""
         for segment in snake.segments():
             pygame.draw.rect(
@@ -45,7 +45,7 @@ class View:
                 (*segment, snake._size, snake._size),
             )
 
-    def render_fruit(self, fruit: Fruit):
+    def render_fruit(self, fruit: Fruit) -> None:
         """Renders the fruit based on its state."""
         pygame.draw.rect(
             self.surface,

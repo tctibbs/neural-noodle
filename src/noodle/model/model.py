@@ -24,14 +24,14 @@ class GameState:
 class Model:
     """Manages the state and rules of the Snake Game."""
 
-    def __init__(self, width: int, height: int, cell_size: int):
+    def __init__(self, width: int, height: int, cell_size: int) -> None:
         self.width = width
         self.height = height
         self.cell_size = cell_size
 
         self.reset()
 
-    def reset(self):
+    def reset(self) -> None:
         """Resets the game state and metrics."""
         self.spawn_snake()
         self.spawn_fruit()
@@ -62,13 +62,13 @@ class Model:
             return True
         return False
 
-    def spawn_snake(self):
+    def spawn_snake(self) -> None:
         """Spawns a new snake in the center of the grid."""
         self._snake = Snake(
             length=3, starting_position=Point(self.width // 2, self.height // 2)
         )
 
-    def spawn_fruit(self):
+    def spawn_fruit(self) -> None:
         """Spawns a fruit at a random location not occupied by the snake."""
         while True:
             fruit_position = Point(

@@ -1,4 +1,5 @@
 """Snake Game Entities."""
+
 from __future__ import annotations
 
 from collections import deque
@@ -12,13 +13,13 @@ class Point(NamedTuple):
     x: int
     y: int
 
-    def __add__(self, other):
+    def __add__(self, other: Point) -> Point:
         if isinstance(other, Point):
             return Point(self.x + other.x, self.y + other.y)
         else:
             raise TypeError(f"Unsupported operand type for {type(other)}")
 
-    def __sub__(self, other):
+    def __sub__(self, other: Point) -> Point:
         if isinstance(other, Point):
             return Point(self.x - other.x, self.y - other.y)
         else:

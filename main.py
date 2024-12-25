@@ -8,7 +8,7 @@ CELL_SIZE = 25
 FPS = 15
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--manual",

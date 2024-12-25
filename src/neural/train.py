@@ -100,8 +100,8 @@ def train_snake_dqn(timesteps: int) -> None:
     env = create_snake_env()
     model = create_dqn_model(env)
 
-    USE_LEARN = False
-    if USE_LEARN:
+    use_learn = False
+    if use_learn:
         model.learn(total_timesteps=timesteps)
     else:
         # Initialize tracking variables
@@ -120,7 +120,7 @@ def train_snake_dqn(timesteps: int) -> None:
             model.exploration_initial_eps - model.exploration_final_eps
         ) / (timesteps * model.exploration_fraction)
 
-        for step in range(timesteps):
+        for _step in range(timesteps):
             # Adjust epsilon based on the step
             epsilon = max(model.exploration_final_eps, epsilon - epsilon_decay)
 

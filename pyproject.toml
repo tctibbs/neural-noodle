@@ -34,7 +34,7 @@ stable-baselines3 = "^2.3.2"
 
 # Development dependencies.
 [tool.poetry.dev-dependencies]
-ruff = "^0.1.14"
+ruff = "^0.8.4"
 pytest = "^7.4.4"
 
 # Poetry build system requirements.
@@ -42,12 +42,12 @@ pytest = "^7.4.4"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
 [tool.ruff]
 line-length = 80
 indent-width = 4
 exclude = ["**/__init__.py"]
 
+[tool.ruff.lint]
 # E: Enforces PEP 8 errors (syntax or structural errors in the code).
 # F: Enforces Pyflakes rules for catching unused imports and variables.
 # W: Enables general warnings for non-standard Python usage.
@@ -58,4 +58,5 @@ exclude = ["**/__init__.py"]
 # ICN: Enforces improved code readability and naming conventions.
 # Q: Enforces consistent usage of single or double quotes.
 # PD: Enforces pandas-specific best practices and catches common issues.
-select = ["E", "F", "W", "N", "BLE", "B", "A", "ICN", "Q", "PD"]
+# ANN: Enforces checks for type/return annotations
+select = ["E", "F", "W", "N", "BLE", "B", "A", "ICN", "Q", "PD", 'ANN']
