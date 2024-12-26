@@ -62,11 +62,11 @@ def update_plot(
 
 
 def create_snake_env(
-    width: int = 400, height: int = 400, cell_size: int = 25, fps: int = 120
+    width: int = 400, height: int = 400, size: int = 16, fps: int = 120
 ) -> SnakeGameEnv:
     """Creates and returns the Snake game environment."""
     return SnakeGameEnv(
-        width=width, height=height, cell_size=cell_size, fps=fps
+        cols=size, rows=size, width=width, height=height, fps=fps
     )
 
 

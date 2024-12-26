@@ -1,38 +1,15 @@
-"""Snake Game Entities."""
+"""Snake module.
+
+This module defines the `Snake` entity, which represents the player's snake
+in the game. The class manages the snake's movement, direction, and state,
+such as its size and segments.
+"""
 
 from __future__ import annotations
 
 from collections import deque
-from enum import Enum
-from typing import NamedTuple
 
-
-class Point(NamedTuple):
-    """Named tuple class for a point."""
-
-    x: int
-    y: int
-
-    def __add__(self, other: Point) -> Point:
-        if isinstance(other, Point):
-            return Point(self.x + other.x, self.y + other.y)
-        else:
-            raise TypeError(f"Unsupported operand type for {type(other)}")
-
-    def __sub__(self, other: Point) -> Point:
-        if isinstance(other, Point):
-            return Point(self.x - other.x, self.y - other.y)
-        else:
-            raise TypeError(f"Unsupported operand type for {type(other)}")
-
-
-class Direction(Enum):
-    """Enum class for the directions."""
-
-    UP = 0
-    RIGHT = 1
-    DOWN = 2
-    LEFT = 3
+from . import Cell, Direction
 
 
 class Snake:
@@ -47,7 +24,7 @@ class Snake:
     def __init__(
         self,
         length: int,
-        starting_position: Point,
+        starting_position: Cell,
         starting_direction: Direction = Direction.RIGHT,
     ) -> None:
         self._length = length
@@ -76,15 +53,15 @@ class Snake:
         ):
             self._direction = direction
 
-    def head(self) -> Point:
+    def head(self) -> Cell:
         """Returns the head of the snake."""
         return self._segments[0]
 
-    def tail(self) -> Point:
+    def tail(self) -> Cell:
         """Returns the tail of the snake."""
         return self._segments[-1]
 
-    def segments(self) -> list[Point]:
+    def segments(self) -> list[Cell]:
         """Returns the segments of the snake."""
         return list(self._segments)
 
@@ -98,21 +75,9 @@ class Snake:
 
     def move(self) -> None:
         """Moves the snake based on its current direction."""
-        x_delta = 0
-        y_delta = 0
-        if self._direction == Direction.UP:
-            y_delta = -self._size
-        elif self._direction == Direction.RIGHT:
-            x_delta = self._size
-        elif self._direction == Direction.DOWN:
-            y_delta = self._size
-        elif self._direction == Direction.LEFT:
-            x_delta = -self._size
-
-        current_head = self.head()
-        new_head = Point(current_head.x + x_delta, current_head.y + y_delta)
-
+        new_head = self.head().move(self._direction)
         self._segments.appendleft(new_head)
+
         if len(self._segments) > self._length:
             self._segments.pop()
 
@@ -120,22 +85,3 @@ class Snake:
         """Increases the snake's length after eating."""
         self._length += 1
         self._turns_since_eat = 0
-
-
-class Fruit:
-    """Fruit entity.
-
-    Attributes:
-        position: The position of the fruit.
-        size: The size of the fruit.
-    """
-
-    def __init__(self, position: Point, size: int) -> None:
-        assert isinstance(position, Point), "Position must be a Point."
-
-        self._position = position
-        self._size = size
-
-    def position(self) -> Point:
-        """Returns the position of the fruit."""
-        return self._position

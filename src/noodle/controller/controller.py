@@ -5,14 +5,16 @@ from typing import NoReturn
 
 import pygame
 
-from src.noodle import Model, View
-from src.noodle.model import Direction
+from src.noodle import model, view
+from src.noodle.model.entities import Direction
 
 
 class Controller:
     """Controller for the Snake game, managing input and game flow."""
 
-    def __init__(self, model: Model, view: View, fps: int) -> None:
+    def __init__(
+        self, model: model.GameLogic, view: view.GameRenderer, fps: int
+    ) -> None:
         self.model = model
         self.view = view
         self.fps = fps
@@ -24,9 +26,7 @@ class Controller:
             direction = self.get_user_action()
             curr_state = self.model.play_step(direction)
 
-            self.view.render(
-                self.model.snake, self.model.fruit, curr_state.score
-            )
+            self.view.render(self.model, curr_state.score)
 
             if curr_state.done:
                 self.model.reset()

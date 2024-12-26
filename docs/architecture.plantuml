@@ -1,0 +1,44 @@
+@startuml
+skinparam packageStyle rect
+
+' High-level architecture
+package "Noodle Package" {
+    package "Model" {
+        class GameLogic
+        class GameState
+        class Snake
+        class Fruit
+        class Direction
+        class Point
+    }
+
+    package "View" {
+        class GameRenderer
+        class Colors
+    }
+
+    package "Controller" {
+        class GameController
+    }
+}
+
+' Dependencies
+GameController --> GameLogic
+GameController --> GameRenderer
+
+GameLogic --> GameState
+GameLogic --> Snake
+GameLogic --> Fruit
+GameLogic --> Direction
+GameLogic --> Point
+
+Snake --> Direction
+Snake --> Point
+
+Fruit --> Point
+
+GameRenderer --> GameLogic
+GameRenderer --> Snake
+GameRenderer --> Fruit
+GameRenderer --> Colors
+@enduml

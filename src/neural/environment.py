@@ -1,4 +1,5 @@
 """Snake Game wrapper over Gymnasium environment."""
+
 import copy
 
 import gymnasium as gym
@@ -6,8 +7,8 @@ import numpy as np
 import pygame
 from gymnasium import spaces
 
-from src.noodle import Controller, Model, View
-from src.noodle.model import Direction
+from src.noodle import model, view, controller
+from src.noodle.model.entities import Direction
 
 
 class SnakeGameEnv(gym.Env):
@@ -17,20 +18,19 @@ class SnakeGameEnv(gym.Env):
 
     def __init__(
         self,
-        width: int = 400,
-        height: int = 400,
-        cell_size: int = 25,
+        cols: int,
+        rows: int,
+        width: int,
+        height: int,
         fps: int = 120,
     ) -> None:
         super(SnakeGameEnv, self).__init__()
 
+        self.cols: int = cols
+        self.rows: int = rows
         self.width: int = width
         self.height: int = height
-        self.cell_size: int = cell_size
         self.fps: int = fps
-
-        self.model: Model = Model(self.width, self.height, self.cell_size)
-        self.view: View = View(self.width, self.height, self.cell_size)
 
         # Action space: 0 - UP, 1 - RIGHT, 2 - DOWN, 3 - LEFT
         self.action_space: gym.Space = spaces.Discrete(4)
@@ -43,9 +43,11 @@ class SnakeGameEnv(gym.Env):
             low=-np.inf, high=np.inf, shape=(6,), dtype=np.float32
         )
 
-        self.controller: Controller = Controller(
-            self.model, self.view, self.fps
+        self.model = model.GameLogic(self.cols, self.rows)
+        self.view = view.GameRenderer(
+            self.width, self.height, self.rows, self.cols
         )
+        self.controller = controller.Controller(self.model, self.view, self.fps)
 
     def reset(
         self, seed: int | None = None, options: dict | None = None
@@ -109,9 +111,7 @@ class SnakeGameEnv(gym.Env):
 
     def render(self, mode: str = "human") -> None:
         """Render the game state."""
-        self.view.render(
-            self.model.snake, self.model.fruit, self.model.state.score
-        )
+        self.view.render(self.model, self.model.state.score)
 
     def close(self) -> None:
         """Close the game (e.g., the Pygame window)."""
@@ -153,29 +153,21 @@ class SnakeGameEnv(gym.Env):
         segments = self.model.snake.segments()
 
         # Distance to the walls in each direction
-        distance_up = head.y // self.cell_size
-        distance_down = (self.height - head.y) // self.cell_size - 1
-        distance_left = head.x // self.cell_size
-        distance_right = (self.width - head.x) // self.cell_size - 1
+        distance_up = self.rows
+        distance_down = self.rows - head.row - 1
+        distance_left = head.col
+        distance_right = self.cols - head.col - 1
 
         # Check if there's danger (snake's body) closer than the walls
         for segment in segments[1:]:  # Skip the head
-            if segment.x == head.x and segment.y < head.y:
-                distance_up = min(
-                    distance_up, (head.y - segment.y) // self.cell_size
-                )
-            elif segment.x == head.x and segment.y > head.y:
-                distance_down = min(
-                    distance_down, (segment.y - head.y) // self.cell_size
-                )
-            elif segment.y == head.y and segment.x < head.x:
-                distance_left = min(
-                    distance_left, (head.x - segment.x) // self.cell_size
-                )
-            elif segment.y == head.y and segment.x > head.x:
-                distance_right = min(
-                    distance_right, (segment.x - head.x) // self.cell_size
-                )
+            if segment.row == head.row and segment.col < head.col:
+                distance_up = min(distance_up, (head.col - segment.col))
+            elif segment.row == head.row and segment.col > head.col:
+                distance_down = min(distance_down, (segment.col - head.col))
+            elif segment.col == head.col and segment.row < head.row:
+                distance_left = min(distance_left, (head.row - segment.row))
+            elif segment.col == head.col and segment.row > head.row:
+                distance_right = min(distance_right, (segment.row - head.row))
 
         return [
             float(distance_up),
