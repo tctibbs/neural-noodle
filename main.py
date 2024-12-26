@@ -1,6 +1,6 @@
 import argparse
 
-from src.noodle import Controller, Model, View
+from src.noodle import Controller, GameLogic, View
 
 # Constants
 WIDTH, HEIGHT = 400, 400
@@ -17,7 +17,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    game_model = Model(width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE)
+    game_model = GameLogic(width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE)
     game_view = View(width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE)
 
     if args.manual:
