@@ -1,14 +1,20 @@
-"""Snake Game View."""
+"""Game renderer module.
 
-from enum import Enum
+This module defines the `GameRenderer` class, which is responsible for rendering
+the graphical elements of the Snake game, including the grid, snake, and fruit.
+It manages the game's visual representation and updates the display to reflect
+the current game state.
+"""
 
 import pygame
 
 from src.noodle.model.entities import Fruit, Snake
 
+from . import Colors
 
-class View:
-    """View for the Snake game, handles rendering."""
+
+class GameRenderer:
+    """Handles rendering for the Snake game."""
 
     def __init__(self, width: int, height: int, cell_size: int) -> None:
         self.width = width
@@ -25,8 +31,6 @@ class View:
         self.render_fruit(fruit)
         self.screen.blit(self.surface, (0, 0))
         pygame.display.flip()
-
-        # Render score
         pygame.display.set_caption(f"Snake Game - Score: {score}")
 
     def draw_grid(self) -> None:
@@ -52,12 +56,3 @@ class View:
             Colors.RED.value,
             (*fruit.position(), fruit._size, fruit._size),
         )
-
-
-class Colors(Enum):
-    """Enum class for the colors."""
-
-    WHITE = (255, 255, 255)
-    BLACK = (0, 0, 0)
-    RED = (255, 0, 0)
-    BLUE = (0, 0, 255)

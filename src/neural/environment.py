@@ -7,7 +7,7 @@ import numpy as np
 import pygame
 from gymnasium import spaces
 
-from src.noodle import Controller, GameLogic, View
+from src.noodle import Controller, GameLogic, GameRenderer
 from src.noodle.model.entities import Direction
 
 
@@ -30,10 +30,8 @@ class SnakeGameEnv(gym.Env):
         self.cell_size: int = cell_size
         self.fps: int = fps
 
-        self.model: GameLogic = GameLogic(
-            self.width, self.height, self.cell_size
-        )
-        self.view: View = View(self.width, self.height, self.cell_size)
+        self.model = GameLogic(self.width, self.height, self.cell_size)
+        self.view = GameRenderer(self.width, self.height, self.cell_size)
 
         # Action space: 0 - UP, 1 - RIGHT, 2 - DOWN, 3 - LEFT
         self.action_space: gym.Space = spaces.Discrete(4)
