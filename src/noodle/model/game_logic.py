@@ -1,25 +1,19 @@
+"""Game logic module.
+
+This module defines the `GameLogic` class, which manages the core state and
+rules of the game. It handles interactions between the snake, fruit, and game
+grid, updates the game state, and enforces game rules such as collisions and
+scoring.
+"""
+
 import random
-from dataclasses import dataclass
 
-import numpy as np
-
-from .entities import Fruit, Point, Snake, Direction
-
-
-@dataclass
-class GameState:
-    """Keeps track of game metrics."""
-
-    done: bool = False
-    score: int = 0
-    steps_taken: int = 0
-    turns_since_ate: int = 0
-    fruits_eaten: int = 0
-    distance_to_fruit: float = np.inf
-    moves_per_fruit: float = np.inf
+from .entities import Direction, Fruit, Point, Snake
+from .game_state import GameState
+from .utils import _manhattan_distance
 
 
-class Model:
+class GameLogic:
     """Manages the state and rules of the Snake Game."""
 
     def __init__(self, width: int, height: int, cell_size: int) -> None:
@@ -116,8 +110,3 @@ class Model:
             )
             // self.cell_size
         )
-
-
-def _manhattan_distance(p1: Point, p2: Point) -> float:
-    """Returns the Manhattan distance between two points."""
-    return abs(p1.x - p2.x) + abs(p1.y - p2.y)
