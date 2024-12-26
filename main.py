@@ -1,6 +1,6 @@
 import argparse
 
-from src.noodle import Controller, GameLogic, GameRenderer
+from src import noodle
 
 # Constants
 WIDTH, HEIGHT = 400, 400
@@ -17,11 +17,17 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    game_model = GameLogic(width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE)
-    game_view = GameRenderer(width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE)
+    game_model = noodle.model.GameLogic(
+        width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE
+    )
+    game_view = noodle.view.GameRenderer(
+        width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE
+    )
 
     if args.manual:
-        game_controller = Controller(game_model, game_view, FPS)
+        game_controller = noodle.controller.Controller(
+            game_model, game_view, FPS
+        )
         game_controller.play()
     else:
         pass
