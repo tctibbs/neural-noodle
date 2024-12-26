@@ -8,18 +8,16 @@ scoring.
 
 import random
 
-from .entities import Direction, Fruit, Point, Snake
+from .entities import Cell, Direction, Fruit, Snake
 from .game_state import GameState
-from .utils import _manhattan_distance
 
 
 class GameLogic:
     """Manages the state and rules of the Snake Game."""
 
-    def __init__(self, width: int, height: int, cell_size: int) -> None:
-        self.width = width
-        self.height = height
-        self.cell_size = cell_size
+    def __init__(self, cols: int, rows: int) -> None:
+        self.cols = cols
+        self.rows = rows
 
         self.reset()
 
@@ -41,37 +39,34 @@ class GameLogic:
 
         return self.state
 
-    def check_collision(self, position: Point) -> bool:
+    def check_collision(self, position: Cell) -> bool:
         """Checks if the snake has collided with itself or the walls."""
         if position in self.snake.segments()[1:]:
             return True
         if (
-            position.x < 0
-            or position.x >= self.width
-            or position.y < 0
-            or position.y >= self.height
+            position.row < 0
+            or position.row >= self.rows
+            or position.col < 0
+            or position.col >= self.cols
         ):
             return True
         return False
 
     def spawn_snake(self) -> None:
         """Spawns a new snake in the center of the grid."""
-        self._snake = Snake(
-            length=3, starting_position=Point(self.width // 2, self.height // 2)
-        )
+        center_cell = Cell(self.rows // 2, self.cols // 2)
+        self._snake = Snake(length=3, starting_position=center_cell)
 
     def spawn_fruit(self) -> None:
         """Spawns a fruit at a random location not occupied by the snake."""
         while True:
-            fruit_position = Point(
-                random.randint(0, self.width // self.cell_size - 1)
-                * self.cell_size,
-                random.randint(0, self.height // self.cell_size - 1)
-                * self.cell_size,
+            fruit_position = Cell(
+                row=random.randint(0, self.rows - 1),
+                col=random.randint(0, self.cols - 1),
             )
             if fruit_position not in self.snake.segments():
                 break
-        self._fruit = Fruit(fruit_position, self.cell_size)
+        self._fruit = Fruit(fruit_position)
 
     @property
     def snake(self) -> Snake:
@@ -103,10 +98,6 @@ class GameLogic:
         else:
             self.state.turns_since_ate += 1
 
-        self.state.distance_to_fruit = (
-            _manhattan_distance(
-                self.snake.head(),
-                self.fruit.position(),
-            )
-            // self.cell_size
+        self.state.distance_to_fruit = self.snake.head().distance(
+            self.fruit.position()
         )

@@ -1,4 +1,4 @@
-"""Direction module for the Snake Game.
+"""Direction module.
 
 This module defines the `Direction` enum, which represents the possible
 movement directions in the game. Each direction is associated with an integer

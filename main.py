@@ -3,8 +3,8 @@ import argparse
 from src import noodle
 
 # Constants
+GRID_SIZE = 16
 WIDTH, HEIGHT = 400, 400
-CELL_SIZE = 25
 FPS = 15
 
 
@@ -17,11 +17,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    game_model = noodle.model.GameLogic(
-        width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE
-    )
+    game_model = noodle.model.GameLogic(cols=GRID_SIZE, rows=GRID_SIZE)
     game_view = noodle.view.GameRenderer(
-        width=WIDTH, height=HEIGHT, cell_size=CELL_SIZE
+        width=WIDTH, height=HEIGHT, cols=GRID_SIZE, rows=GRID_SIZE
     )
 
     if args.manual:

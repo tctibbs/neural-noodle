@@ -16,10 +16,10 @@ from . import Colors
 class GameRenderer:
     """Handles rendering for the Snake game."""
 
-    def __init__(self, width: int, height: int, cell_size: int) -> None:
+    def __init__(self, width: int, height: int, rows: int, cols: int) -> None:
         self.width = width
         self.height = height
-        self.cell_size = cell_size
+        self.cell_size = self._calculate_cell_size(rows, cols)
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.surface = pygame.Surface(self.screen.get_size()).convert()
 
@@ -35,24 +35,30 @@ class GameRenderer:
 
     def render_grid(self) -> None:
         """Renders the grid on the screen."""
-        for y in range(0, self.height, self.cell_size):
-            for x in range(0, self.width, self.cell_size):
-                rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
+        for row in range(self.height // self.cell_size):
+            for col in range(self.width // self.cell_size):
+                rect = self._cell_to_rect(model.entities.Cell(row, col))
                 pygame.draw.rect(self.surface, Colors.WHITE.value, rect, 1)
 
     def render_snake(self, snake: model.entities.Snake) -> None:
         """Renders the snake on the screen."""
         for segment in snake.segments():
-            pygame.draw.rect(
-                self.surface,
-                Colors.BLUE.value,
-                (*segment, snake._size, snake._size),
-            )
+            rect = self._cell_to_rect(segment)
+            pygame.draw.rect(self.surface, Colors.BLUE.value, rect)
 
     def render_fruit(self, fruit: model.entities.Fruit) -> None:
         """Renders the fruit on the screen."""
-        pygame.draw.rect(
-            self.surface,
-            Colors.RED.value,
-            (*fruit.position(), fruit._size, fruit._size),
-        )
+        rect = self._cell_to_rect(fruit.position())
+        pygame.draw.rect(self.surface, Colors.RED.value, rect)
+
+    def _calculate_cell_size(self, rows: int, cols: int) -> int:
+        """Returns the cell size based on grid dimensions."""
+        cell_width = self.width // cols
+        cell_height = self.height // rows
+        return min(cell_width, cell_height)
+
+    def _cell_to_rect(self, cell: model.entities.Cell) -> pygame.Rect:
+        """Converts a grid cell to a pixel rectangle."""
+        x = cell.col * self.cell_size
+        y = cell.row * self.cell_size
+        return pygame.Rect(x, y, self.cell_size, self.cell_size)

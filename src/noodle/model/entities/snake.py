@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from collections import deque
 
-from . import Direction, Point
+from . import Cell, Direction
 
 
 class Snake:
@@ -24,7 +24,7 @@ class Snake:
     def __init__(
         self,
         length: int,
-        starting_position: Point,
+        starting_position: Cell,
         starting_direction: Direction = Direction.RIGHT,
     ) -> None:
         self._length = length
@@ -53,15 +53,15 @@ class Snake:
         ):
             self._direction = direction
 
-    def head(self) -> Point:
+    def head(self) -> Cell:
         """Returns the head of the snake."""
         return self._segments[0]
 
-    def tail(self) -> Point:
+    def tail(self) -> Cell:
         """Returns the tail of the snake."""
         return self._segments[-1]
 
-    def segments(self) -> list[Point]:
+    def segments(self) -> list[Cell]:
         """Returns the segments of the snake."""
         return list(self._segments)
 
@@ -75,21 +75,9 @@ class Snake:
 
     def move(self) -> None:
         """Moves the snake based on its current direction."""
-        x_delta = 0
-        y_delta = 0
-        if self._direction == Direction.UP:
-            y_delta = -self._size
-        elif self._direction == Direction.RIGHT:
-            x_delta = self._size
-        elif self._direction == Direction.DOWN:
-            y_delta = self._size
-        elif self._direction == Direction.LEFT:
-            x_delta = -self._size
-
-        current_head = self.head()
-        new_head = Point(current_head.x + x_delta, current_head.y + y_delta)
-
+        new_head = self.head().move(self._direction)
         self._segments.appendleft(new_head)
+
         if len(self._segments) > self._length:
             self._segments.pop()
 
