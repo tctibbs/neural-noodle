@@ -8,7 +8,7 @@ the current game state.
 
 import pygame
 
-from src.noodle.model.entities import Fruit, Snake
+from src.noodle import model
 
 from . import Colors
 
@@ -23,25 +23,25 @@ class GameRenderer:
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.surface = pygame.Surface(self.screen.get_size()).convert()
 
-    def render(self, snake: Snake, fruit: Fruit, score: int) -> None:
+    def render(self, model: model.GameLogic, score: int) -> None:
         """Renders the game state onto the screen."""
         self.surface.fill(Colors.BLACK.value)
-        self.draw_grid()
-        self.render_snake(snake)
-        self.render_fruit(fruit)
+        self.render_grid()
+        self.render_snake(model.snake)
+        self.render_fruit(model.fruit)
         self.screen.blit(self.surface, (0, 0))
         pygame.display.flip()
         pygame.display.set_caption(f"Snake Game - Score: {score}")
 
-    def draw_grid(self) -> None:
-        """Draws the grid on the screen."""
+    def render_grid(self) -> None:
+        """Renders the grid on the screen."""
         for y in range(0, self.height, self.cell_size):
             for x in range(0, self.width, self.cell_size):
                 rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
                 pygame.draw.rect(self.surface, Colors.WHITE.value, rect, 1)
 
-    def render_snake(self, snake: Snake) -> None:
-        """Renders the snake based on its state."""
+    def render_snake(self, snake: model.entities.Snake) -> None:
+        """Renders the snake on the screen."""
         for segment in snake.segments():
             pygame.draw.rect(
                 self.surface,
@@ -49,8 +49,8 @@ class GameRenderer:
                 (*segment, snake._size, snake._size),
             )
 
-    def render_fruit(self, fruit: Fruit) -> None:
-        """Renders the fruit based on its state."""
+    def render_fruit(self, fruit: model.entities.Fruit) -> None:
+        """Renders the fruit on the screen."""
         pygame.draw.rect(
             self.surface,
             Colors.RED.value,

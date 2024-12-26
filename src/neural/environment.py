@@ -107,9 +107,7 @@ class SnakeGameEnv(gym.Env):
 
     def render(self, mode: str = "human") -> None:
         """Render the game state."""
-        self.view.render(
-            self.model.snake, self.model.fruit, self.model.state.score
-        )
+        self.view.render(self.model, self.model.state.score)
 
     def close(self) -> None:
         """Close the game (e.g., the Pygame window)."""

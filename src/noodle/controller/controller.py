@@ -26,9 +26,7 @@ class Controller:
             direction = self.get_user_action()
             curr_state = self.model.play_step(direction)
 
-            self.view.render(
-                self.model.snake, self.model.fruit, curr_state.score
-            )
+            self.view.render(self.model, curr_state.score)
 
             if curr_state.done:
                 self.model.reset()
