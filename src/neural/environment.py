@@ -1,4 +1,5 @@
 """Snake Game wrapper over Gymnasium environment."""
+
 import copy
 
 import gymnasium as gym
@@ -7,7 +8,7 @@ import pygame
 from gymnasium import spaces
 
 from src.noodle import Controller, Model, View
-from src.noodle.model import Direction
+from src.noodle.model.entities import Direction
 
 
 class SnakeGameEnv(gym.Env):

@@ -3,9 +3,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from src.noodle.model.entities import Direction
-
-from . import Fruit, Point, Snake
+from .entities import Fruit, Point, Snake, Direction
 
 
 @dataclass

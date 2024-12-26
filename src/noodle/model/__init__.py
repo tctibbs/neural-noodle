@@ -1,4 +1,4 @@
 """Snake Game Model Package."""
 
-from .entities import Snake, Fruit, Direction, Point
+from . import entities
 from .model import Model

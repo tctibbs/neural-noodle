@@ -1,38 +1,15 @@
-"""Snake Game Entities."""
+"""Snake module.
+
+This module defines the `Snake` entity, which represents the player's snake
+in the game. The class manages the snake's movement, direction, and state,
+such as its size and segments.
+"""
 
 from __future__ import annotations
 
 from collections import deque
-from enum import Enum
-from typing import NamedTuple
 
-
-class Point(NamedTuple):
-    """Named tuple class for a point."""
-
-    x: int
-    y: int
-
-    def __add__(self, other: Point) -> Point:
-        if isinstance(other, Point):
-            return Point(self.x + other.x, self.y + other.y)
-        else:
-            raise TypeError(f"Unsupported operand type for {type(other)}")
-
-    def __sub__(self, other: Point) -> Point:
-        if isinstance(other, Point):
-            return Point(self.x - other.x, self.y - other.y)
-        else:
-            raise TypeError(f"Unsupported operand type for {type(other)}")
-
-
-class Direction(Enum):
-    """Enum class for the directions."""
-
-    UP = 0
-    RIGHT = 1
-    DOWN = 2
-    LEFT = 3
+from . import Direction, Point
 
 
 class Snake:
@@ -120,22 +97,3 @@ class Snake:
         """Increases the snake's length after eating."""
         self._length += 1
         self._turns_since_eat = 0
-
-
-class Fruit:
-    """Fruit entity.
-
-    Attributes:
-        position: The position of the fruit.
-        size: The size of the fruit.
-    """
-
-    def __init__(self, position: Point, size: int) -> None:
-        assert isinstance(position, Point), "Position must be a Point."
-
-        self._position = position
-        self._size = size
-
-    def position(self) -> Point:
-        """Returns the position of the fruit."""
-        return self._position

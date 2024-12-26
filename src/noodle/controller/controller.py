@@ -6,7 +6,7 @@ from typing import NoReturn
 import pygame
 
 from src.noodle import Model, View
-from src.noodle.model import Direction
+from src.noodle.model.entities import Direction
 
 
 class Controller:
