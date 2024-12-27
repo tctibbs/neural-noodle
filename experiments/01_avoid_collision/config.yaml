@@ -1,0 +1,28 @@
+# Configuration for training the Snake RL model
+
+environment:
+  width: 400        # Game window width
+  height: 400       # Game window height
+  grid_size: 16     # Grid size (rows/columns)
+  fps: 120          # Frames per second
+
+dqn:
+  policy: MlpPolicy           # Type of policy
+  buffer_size: 1_000_000      # Replay buffer size
+  learning_rate: 0.001        # Optimizer learning rate
+  batch_size: 64              # Training batch size
+  exploration_fraction: 0.4   # Exploration fraction of total timesteps
+  exploration_eps:
+    initial: 1.0           # Initial epsilon (exploration rate)
+    final: 0.01            # Final epsilon
+  target_update: 1000      # Target network update frequency
+  network_architecture:    # Neural network architecture
+    - 256
+    - 256
+
+training:
+  timesteps: 1_000_000    # Total training timesteps
+  use_builtin: false      # Use built-in `learn` method (true/false)
+
+evaluation:
+  episodes: 10             # Number of episodes to evaluate the model
