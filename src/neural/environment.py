@@ -66,15 +66,7 @@ class SnakeGameEnv(gym.Env):
         Apply action, update the game state,
         and return the necessary Gym output.
         """
-        # Update direction based on action (0: UP, 1: RIGHT, 2: DOWN, 3: LEFT)
-        if action == 0:
-            direction = Direction.UP
-        elif action == 1:
-            direction = Direction.RIGHT
-        elif action == 2:
-            direction = Direction.DOWN
-        elif action == 3:
-            direction = Direction.LEFT
+        direction = Direction(action)
 
         prev_state = copy.deepcopy(self.model.state)
         curr_state = self.model.play_step(direction)
@@ -93,10 +85,10 @@ class SnakeGameEnv(gym.Env):
 
         # Debugging output to track actions and game state
         print(
-            f"Action: {action}, Reward: {reward}"
-            + f", Turns since ate: {curr_state.turns_since_ate}"
-            + f", Done: {curr_state.done}"
-            + f", Fruits eaten: {curr_state.fruits_eaten}"
+            f"Direction: {direction:<6}, Reward: {reward:<4}, "
+            f"Turns since ate: {curr_state.turns_since_ate}, "
+            f"Done: {curr_state.done}, "
+            f"Fruits eaten: {curr_state.fruits_eaten}"
         )
 
         return obs, reward, terminated, truncated, info
