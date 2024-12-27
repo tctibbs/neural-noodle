@@ -25,7 +25,6 @@ class SnakeGameEnv(gym.Env):
         width: int,
         height: int,
         reward_policy: training.RewardPolicy,
-        fps: int = 120,
     ) -> None:
         super().__init__()
         self.reward_policy = reward_policy
@@ -34,7 +33,6 @@ class SnakeGameEnv(gym.Env):
         self.rows: int = rows
         self.width: int = width
         self.height: int = height
-        self.fps: int = fps
 
         # Action space: 0 - UP, 1 - RIGHT, 2 - DOWN, 3 - LEFT
         self.action_space = spaces.Discrete(len(Direction))
