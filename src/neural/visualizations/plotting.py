@@ -47,8 +47,10 @@ class TrainingPlotter:
         self.ax.set_title("Training Rewards Over Time")
         self.ax.set_xlabel("Episode")
         self.ax.set_ylabel("Reward")
-        self.ax.legend()
-        self.ax.grid(True)
+        self.ax.grid(True, linestyle="--", alpha=0.6)  # Improved gridlines
+        self.ax.spines["top"].set_visible(False)
+        self.ax.spines["right"].set_visible(False)
+        plt.tight_layout()
         plt.show()
 
     def update(self, reward: float) -> None:
@@ -62,14 +64,13 @@ class TrainingPlotter:
         self.raw_line.set_data(range(len(self.rewards)), self.rewards)
 
         # Update smoothed rewards if window_size > 1
-        if self.window_size > 1 and len(self.rewards) >= self.window_size:
+        if self.window_size > 1:
             self.smoothed_rewards = self._moving_average(
                 self.rewards, self.window_size
             )
             # Align the x-axis for smoothed data
             self.smoothed_line.set_data(
-                range(self.window_size - 1, len(self.rewards)),
-                self.smoothed_rewards,
+                range(len(self.smoothed_rewards)), self.smoothed_rewards
             )
 
         # Adjust plot limits
@@ -84,7 +85,7 @@ class TrainingPlotter:
         self, data: list[float], window_size: int
     ) -> np.ndarray:
         """
-        Compute the moving average using a sliding window.
+        Compute the moving average, adjusting for available data.
 
         Args:
             data: The data points to average.
@@ -93,13 +94,17 @@ class TrainingPlotter:
         Returns:
             The smoothed data.
         """
-        return np.convolve(data, np.ones(window_size), "valid") / window_size
+        smoothed = []
+        for i in range(len(data)):
+            current_window_size = min(window_size, i + 1)
+            smoothed.append(np.mean(data[i - current_window_size + 1 : i + 1]))
+        return np.array(smoothed)
 
     def save_plot(self, filename: str) -> None:
         """
         Save the current plot to a file.
 
         Args:
-            The path to save the plot image.
+            filename: The path to save the plot image.
         """
         self.fig.savefig(filename)
