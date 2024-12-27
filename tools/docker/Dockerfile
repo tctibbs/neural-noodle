@@ -1,6 +1,18 @@
 # Use the official Python 3.13-rc image as the base image
 FROM python:3.12
 
+# Copy installation scripts into the container
+COPY tools/scripts/ /scripts/
+
+# Ensure the scripts are executable
+RUN chmod +x /scripts/install_*
+
+# Run all installation scripts dynamically
+RUN for script in /scripts/install_*; do \
+        echo "Executing $script"; \
+        $script; \
+    done
+
 # Install Poetry, a dependency management tool for Python
 RUN pip install poetry
 
@@ -9,7 +21,6 @@ RUN poetry config virtualenvs.in-project false
 
 # Copy the dependency files (pyproject.toml and poetry.lock) to the container
 COPY ./pyproject.toml ./poetry.lock ./
-
 
 # Configure Poetry to install dependencies into the base environment (no virtualenv)
 RUN poetry config virtualenvs.create false
