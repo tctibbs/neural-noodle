@@ -1,3 +1,3 @@
 """Snake Game Controller Package."""
 
-from . controller import Controller
+from . controller import GameController

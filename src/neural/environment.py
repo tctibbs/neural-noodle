@@ -7,7 +7,7 @@ import numpy as np
 import pygame
 from gymnasium import spaces
 
-from src.noodle import model, view, controller
+from src.noodle import model, view
 from src.noodle.model.entities import Direction
 
 
@@ -47,7 +47,6 @@ class SnakeGameEnv(gym.Env):
         self.view = view.GameRenderer(
             self.width, self.height, self.rows, self.cols
         )
-        self.controller = controller.Controller(self.model, self.view, self.fps)
 
     def reset(
         self, seed: int | None = None, options: dict | None = None

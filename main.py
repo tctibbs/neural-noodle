@@ -45,7 +45,7 @@ def main() -> None:
         game_view = noodle.view.GameRenderer(
             width=WIDTH, height=HEIGHT, cols=GRID_SIZE, rows=GRID_SIZE
         )
-        game_controller = noodle.controller.Controller(
+        game_controller = noodle.controller.GameController(
             game_model, game_view, FPS
         )
         game_controller.play()

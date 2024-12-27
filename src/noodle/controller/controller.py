@@ -9,7 +9,7 @@ from src.noodle import model, view
 from src.noodle.model.entities import Direction
 
 
-class Controller:
+class GameController:
     """Controller for the Snake game, managing input and game flow."""
 
     def __init__(
