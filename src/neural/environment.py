@@ -6,9 +6,11 @@ import gymnasium as gym
 import numpy as np
 import pygame
 from gymnasium import spaces
+
+from src.neural import training
 from src.noodle import model, view
 from src.noodle.model.entities import Direction
-from src.neural import training
+from src.noodle.model.game_state import GameState
 
 
 class SnakeGameEnv(gym.Env):
@@ -35,7 +37,7 @@ class SnakeGameEnv(gym.Env):
         self.fps: int = fps
 
         # Action space: 0 - UP, 1 - RIGHT, 2 - DOWN, 3 - LEFT
-        self.action_space: gym.Space = spaces.Discrete(4)
+        self.action_space = spaces.Discrete(len(Direction))
 
         # Observation space includes:
         # 1. Direction (0: UP, 1: RIGHT, 2: DOWN, 3: LEFT)
@@ -55,9 +57,7 @@ class SnakeGameEnv(gym.Env):
     ) -> tuple[np.ndarray, dict]:
         """Reset the environment to the initial state."""
         super().reset(seed=seed)
-
         self.model.reset()
-
         obs = self._get_observation()
         return obs, {}
 
@@ -66,26 +66,16 @@ class SnakeGameEnv(gym.Env):
         Apply action, update the game state,
         and return the necessary Gym output.
         """
-        direction = Direction(action)
-
         prev_state = copy.deepcopy(self.model.state)
-        curr_state = self.model.play_step(direction)
+        curr_state = self.model.play_step(Direction(action))
         obs = self._get_observation()
 
-        # By default, not terminated/truncated
-        terminated = False
-        truncated = False
-
-        # Handle the environment's "done" logic (collision)
-        if curr_state.done:
-            terminated = True
-
+        terminated, truncated = self._get_termination_flags(curr_state)
         reward = self.reward_policy(prev_state, curr_state)
         info = {}
 
-        # Debugging output to track actions and game state
         print(
-            f"Direction: {direction:<6}, Reward: {reward:<4}, "
+            f"Reward: {reward:<2}, "
             f"Turns since ate: {curr_state.turns_since_ate}, "
             f"Done: {curr_state.done}, "
             f"Fruits eaten: {curr_state.fruits_eaten}"
@@ -103,21 +93,17 @@ class SnakeGameEnv(gym.Env):
 
     def _get_observation(self) -> np.ndarray:
         """Direction, distance to danger, and distance to fruit."""
-        direction = (
-            self.model.snake.direction().value
-        )  # 0: UP, 1: RIGHT, 2: DOWN, 3: LEFT
-        distances_to_danger = self._get_distances_to_danger()
+        direction = self.model.snake.direction()
+        distances_to_danger = list(self.model.state.danger_distances.values())
         distance_to_fruit = self.model.state.distance_to_fruit
 
         observation = np.array(
-            [direction] + distances_to_danger + [distance_to_fruit],
+            [direction.value] + distances_to_danger + [distance_to_fruit],
             dtype=np.float32,
         )
 
-        # Human-readable printout of the observation with consistent spacing
-        direction_labels = ["UP", "RIGHT", "DOWN", "LEFT"]
         print(
-            f"{'Direction:':<10} {direction_labels[direction]:<6}"
+            f"{'Direction:':<10} {direction:<6}"
             f"{'Distance to danger:':<20}"
             f"{'Up':<3}{distances_to_danger[0]:<3.0f} "
             f"{'Right':<6}{distances_to_danger[1]:<3.0f} "
@@ -128,34 +114,14 @@ class SnakeGameEnv(gym.Env):
 
         return observation
 
-    def _get_distances_to_danger(self) -> list[float]:
-        """
-        Calculate distances to the nearest wall
-        or the snake's body in four directions.
-        """
-        head = self.model.snake.head()
-        segments = self.model.snake.segments()
+    def _get_termination_flags(
+        self, curr_state: GameState
+    ) -> tuple[bool, bool]:
+        """Returns if the game state indicates termination or truncation."""
+        terminated = False
+        truncated = False
 
-        # Distance to the walls in each direction
-        distance_up = self.rows
-        distance_down = self.rows - head.row - 1
-        distance_left = head.col
-        distance_right = self.cols - head.col - 1
+        if curr_state.done:
+            terminated = True
 
-        # Check if there's danger (snake's body) closer than the walls
-        for segment in segments[1:]:  # Skip the head
-            if segment.row == head.row and segment.col < head.col:
-                distance_up = min(distance_up, (head.col - segment.col))
-            elif segment.row == head.row and segment.col > head.col:
-                distance_down = min(distance_down, (segment.col - head.col))
-            elif segment.col == head.col and segment.row < head.row:
-                distance_left = min(distance_left, (head.row - segment.row))
-            elif segment.col == head.col and segment.row > head.row:
-                distance_right = min(distance_right, (segment.row - head.row))
-
-        return [
-            float(distance_up),
-            float(distance_right),
-            float(distance_down),
-            float(distance_left),
-        ]
+        return terminated, truncated
