@@ -3,7 +3,7 @@
 environment:
   width: 400        # Game window width
   height: 400       # Game window height
-  grid_size: 16     # Grid size (rows/columns)
+  grid_size: 8      # Grid size (rows/columns)
   fps: 120          # Frames per second
 
 dqn:

@@ -58,6 +58,10 @@ package "Noodle Package" {
 package "Neural Package" {
     class TrainScript
 
+    package visualizations {
+      class TrainingPlotter
+    }
+
     interface GymnasiumEnv
     class SnakeGameEnv implements GymnasiumEnv
 }
@@ -88,6 +92,7 @@ GameRenderer --> Colors
 ' Neural Package Dependencies
 ' ----------------------------
 TrainScript --> GymnasiumEnv
+TrainScript --> TrainingPlotter
 SnakeGameEnv --> GameLogic
 SnakeGameEnv --> GameRenderer
 

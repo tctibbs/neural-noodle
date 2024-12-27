@@ -5,60 +5,7 @@ import numpy as np
 from stable_baselines3 import DQN
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.neural import SnakeGameEnv
-
-
-def setup_plot() -> (
-    tuple[plt.Figure, plt.Axes, plt.Axes, plt.Line2D, plt.Line2D]
-):
-    """Sets up the real-time plotting environment."""
-    plt.ion()  # Interactive mode on
-    fig, (reward_ax, length_ax) = plt.subplots(1, 2, figsize=(12, 6))
-
-    # Initialize lines for rewards and lengths
-    (reward_line,) = reward_ax.plot([], [], label="Episode Rewards")
-    (length_line,) = length_ax.plot([], [], label="Episode Lengths")
-
-    # Configure axes for rewards
-    reward_ax.set_xlabel("Episodes")
-    reward_ax.set_ylabel("Rewards")
-    reward_ax.set_title("Episode Rewards Over Time")
-    reward_ax.legend()
-
-    # Configure axes for lengths
-    length_ax.set_xlabel("Episodes")
-    length_ax.set_ylabel("Episode Lengths")
-    length_ax.set_title("Episode Lengths Over Time")
-    length_ax.legend()
-
-    plt.tight_layout()
-
-    return fig, reward_ax, length_ax, reward_line, length_line
-
-
-def update_plot(
-    episode_rewards: list[float],
-    episode_lengths: list[int],
-    reward_line: plt.Line2D,
-    length_line: plt.Line2D,
-) -> None:
-    """Updates the plot in real-time with new episode data."""
-    reward_line.set_xdata(range(len(episode_rewards)))
-    reward_line.set_ydata(episode_rewards)
-
-    length_line.set_xdata(range(len(episode_lengths)))
-    length_line.set_ydata(episode_lengths)
-
-    # Rescale the axes to accommodate new data
-    reward_line.axes.relim()
-    reward_line.axes.autoscale_view()
-
-    length_line.axes.relim()
-    length_line.axes.autoscale_view()
-
-    # Redraw the plot
-    plt.draw()
-    plt.pause(0.01)
+from src.neural import SnakeGameEnv, visualizations
 
 
 def create_snake_env(env_config: dict) -> SnakeGameEnv:
@@ -112,7 +59,7 @@ def train_snake_dqn(config: dict) -> None:
         total_reward = 0
 
         # Setup for real-time plot updates
-        fig, reward_ax, length_ax, reward_line, length_line = setup_plot()
+        training_plotter = visualizations.TrainingPlotter()
 
         # Reset the environment
         obs, _ = env.reset()
@@ -148,9 +95,7 @@ def train_snake_dqn(config: dict) -> None:
                 episode_lengths.append(len(episode_rewards))
 
                 # Update the plot with the new data
-                update_plot(
-                    episode_rewards, episode_lengths, reward_line, length_line
-                )
+                training_plotter.update(episode_rewards, episode_lengths)
 
                 # Reset the environment when the episode ends
                 total_reward = 0
