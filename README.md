@@ -20,3 +20,13 @@ The project includes several experiments, each designed to achieve specific obje
 - [`02 Apple Hunting`](./experiments/02_apple_hunting): Encourage the snake to actively seek and collect apples.
 
 For a detailed breakdown of all experiments, see the [Experiments README](./experiments/README.md).
+
+## Architecture
+
+Below is a high-level UML diagram showing how the Noodle (game) and Neural (RL) packages are organized:
+
+![Architecture](docs/architecture.png)
+
+## License
+
+This project is licensed under the MIT License. Feel free to use and modify the code as you see fit.
