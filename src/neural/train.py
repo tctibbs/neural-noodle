@@ -6,24 +6,10 @@ import numpy as np
 from stable_baselines3 import DQN
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.neural import SnakeGameEnv, training, visualizations
-from src.neural.training.rewards import RewardPolicy
+from src.neural import environment, visualizations
 
 
-def create_snake_env(
-    env_config: dict, reward_policy: RewardPolicy
-) -> SnakeGameEnv:
-    """Returns the Snake game environment."""
-    return SnakeGameEnv(
-        cols=env_config["grid_size"],
-        rows=env_config["grid_size"],
-        width=env_config["width"],
-        height=env_config["height"],
-        reward_policy=reward_policy,
-    )
-
-
-def create_dqn_model(env: SnakeGameEnv, dqn_config: dict) -> DQN:
+def create_dqn_model(env: environment.SnakeGameEnv, dqn_config: dict) -> DQN:
     """Returns the DQN model for training."""
     policy_kwargs = dict(net_arch=dqn_config["network_architecture"])
 
@@ -42,17 +28,15 @@ def create_dqn_model(env: SnakeGameEnv, dqn_config: dict) -> DQN:
     )
 
 
-def train_snake_dqn(config: dict) -> None:
+def train_model(config: dict) -> None:
     """Trains a DQN model on the Snake game and evaluates its performance."""
     # Extract relevant configuration sections
-    env_config = config["environment"]
     dqn_config = config["dqn"]
     training_config = config["training"]
     evaluation_config = config["evaluation"]
 
     # Create environment and DQN model
-    reward_policy = training.RewardPolicy(training_config["reward_policy"])
-    env = create_snake_env(env_config, reward_policy)
+    env = environment.SnakeGameEnv.from_config(config["environment"])
     model = create_dqn_model(env, dqn_config)
 
     # Set the desired steps per second (FPS)
@@ -131,7 +115,7 @@ def train_snake_dqn(config: dict) -> None:
 
 
 def evaluate_and_print_results(
-    model: DQN, env: SnakeGameEnv, n_eval_episodes: int = 10
+    model: DQN, env: environment.SnakeGameEnv, n_eval_episodes: int = 10
 ) -> None:
     """Evaluates the trained model and prints the results."""
     mean_reward, std_reward = evaluate_policy(

@@ -5,6 +5,11 @@ environment:
   height: 400       # Game window height
   grid_size: 8      # Grid size (rows/columns)
 
+  reward_policy:
+    collision: -10         # Reward/penalty if snake collides
+    fruit_eaten: 10        # Reward for eating fruit
+    step: 1                # Reward per step (survival reward)
+
 dqn:
   policy: MlpPolicy           # Type of policy
   buffer_size: 1_000_000      # Replay buffer size
@@ -26,11 +31,6 @@ training:
   steps_per_second: 2 
   # Use built-in `learn` method (true/false)
   use_builtin: false     
-
-  reward_policy:
-    collision: -10         # Reward/penalty if snake collides
-    fruit_eaten: 10        # Reward for eating fruit
-    step: 1                # Reward per step (survival reward)
 
 evaluation:
   episodes: 10             # Number of episodes to evaluate the model

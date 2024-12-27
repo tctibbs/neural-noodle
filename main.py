@@ -53,7 +53,7 @@ def main() -> None:
         # RL training mode
         print(f"Running in RL training mode using config: {args.config}")
         config = load_config(args.config)
-        neural.train.train_snake_dqn(config)
+        neural.train.train_model(config)
 
 
 if __name__ == "__main__":
