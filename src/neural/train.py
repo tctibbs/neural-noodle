@@ -1,12 +1,13 @@
 """Trains the noodle."""
 
-import matplotlib.pyplot as plt
+import time
+
 import numpy as np
 from stable_baselines3 import DQN
 from stable_baselines3.common.evaluation import evaluate_policy
 
+from src.neural import SnakeGameEnv, training, visualizations
 from src.neural.training.rewards import RewardPolicy
-from src.neural import SnakeGameEnv, visualizations, training
 
 
 def create_snake_env(
@@ -19,7 +20,6 @@ def create_snake_env(
         width=env_config["width"],
         height=env_config["height"],
         reward_policy=reward_policy,
-        fps=env_config["fps"],
     )
 
 
@@ -55,6 +55,10 @@ def train_snake_dqn(config: dict) -> None:
     env = create_snake_env(env_config, reward_policy)
     model = create_dqn_model(env, dqn_config)
 
+    # Set the desired steps per second (FPS)
+    steps_per_second = training_config.get("steps_per_second", 10)
+    time_per_step = 1.0 / steps_per_second
+
     # Use the built-in learn method if specified
     if training_config["use_builtin"]:
         model.learn(total_timesteps=training_config["timesteps"])
@@ -64,7 +68,7 @@ def train_snake_dqn(config: dict) -> None:
         total_reward = 0
 
         # Setup for real-time plot updates
-        training_plotter = visualizations.TrainingPlotter()
+        training_plotter = visualizations.TrainingPlotter(window_size=10)
 
         # Reset the environment
         obs, _ = env.reset()
@@ -79,6 +83,8 @@ def train_snake_dqn(config: dict) -> None:
         ) / (training_config["timesteps"] * dqn_config["exploration_fraction"])
 
         for _step in range(training_config["timesteps"]):
+            start_time = time.time()
+
             # Adjust epsilon based on the step
             epsilon = max(
                 dqn_config["exploration_eps"]["final"], epsilon - epsilon_decay
@@ -100,7 +106,7 @@ def train_snake_dqn(config: dict) -> None:
                 episode_lengths.append(len(episode_rewards))
 
                 # Update the plot with the new data
-                training_plotter.update(episode_rewards, episode_lengths)
+                training_plotter.update(total_reward)
 
                 # Reset the environment when the episode ends
                 total_reward = 0
@@ -108,6 +114,11 @@ def train_snake_dqn(config: dict) -> None:
 
             # Render the environment
             env.render()
+
+            # Maintain the desired FPS
+            elapsed_time = time.time() - start_time
+            sleep_time = max(0, time_per_step - elapsed_time)
+            time.sleep(sleep_time)
 
     # Save the trained model
     model.save("dqn_snake")
@@ -117,8 +128,6 @@ def train_snake_dqn(config: dict) -> None:
 
     # Close the environment and turn off interactive plotting
     env.close()
-    plt.ioff()
-    plt.show()
 
 
 def evaluate_and_print_results(

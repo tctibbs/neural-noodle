@@ -4,7 +4,6 @@ environment:
   width: 400        # Game window width
   height: 400       # Game window height
   grid_size: 8      # Grid size (rows/columns)
-  fps: 120          # Frames per second
 
 dqn:
   policy: MlpPolicy           # Type of policy
@@ -21,8 +20,12 @@ dqn:
     - 256
 
 training:
-  timesteps: 1_000_000    # Total training timesteps
-  use_builtin: false      # Use built-in `learn` method (true/false)
+  # Total training timesteps  
+  timesteps: 1_000_000    
+  # Number of steps per second
+  steps_per_second: 2 
+  # Use built-in `learn` method (true/false)
+  use_builtin: false     
 
   reward_policy:
     collision: -10         # Reward/penalty if snake collides

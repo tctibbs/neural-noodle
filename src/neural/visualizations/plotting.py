@@ -1,76 +1,105 @@
 """
-Plotting Module.
+Plotting Module
 
-This module provides a single class, TrainingPlotter, that sets up Matplotlib
-plots for real-time visualization of Snake training and updates them with new
-data. No separate references to reward/length lines are needed.
+This module defines the `TrainingPlotter` class, which facilitates real-time
+visualization of training rewards for reinforcement learning agents.
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class TrainingPlotter:
     """
-    A self-contained class for setting up and updating the Snake training plots.
-
-    Example usage:
-        plotter = TrainingPlotter()
-        ...
-        plotter.update(episode_rewards, episode_lengths)
+    A class responsible for plotting rewards over time during training.
     """
 
-    def __init__(self) -> None:
-        """Initialize the figure, axes, and plot lines."""
-        plt.ion()  # Interactive mode on
-        self.fig, (self.reward_ax, self.length_ax) = plt.subplots(
-            1, 2, figsize=(12, 6)
-        )
-
-        # Create line objects for rewards and lengths
-        (self.reward_line,) = self.reward_ax.plot(
-            [], [], label="Episode Rewards"
-        )
-        (self.length_line,) = self.length_ax.plot(
-            [], [], label="Episode Lengths"
-        )
-
-        # Configure reward axis
-        self.reward_ax.set_xlabel("Episodes")
-        self.reward_ax.set_ylabel("Rewards")
-        self.reward_ax.set_title("Episode Rewards Over Time")
-        self.reward_ax.legend()
-
-        # Configure length axis
-        self.length_ax.set_xlabel("Episodes")
-        self.length_ax.set_ylabel("Episode Lengths")
-        self.length_ax.set_title("Episode Lengths Over Time")
-        self.length_ax.legend()
-
-        plt.tight_layout()
-
-    def update(
-        self, episode_rewards: list[float], episode_lengths: list[int]
-    ) -> None:
+    def __init__(self, window_size: int = 1, figsize: tuple = (10, 6)) -> None:
         """
-        Updates the training plots in real-time with new episode data.
+        Initialize the TrainingPlotter.
 
-        :param episode_rewards: A list of cumulative rewards per episode.
-        :param episode_lengths: A list of lengths (number of steps) per episode.
+        Args:
+            window_size: Size of the moving average window.
+            figsize: Size of the matplotlib figure.
         """
-        self.reward_line.set_xdata(range(len(episode_rewards)))
-        self.reward_line.set_ydata(episode_rewards)
+        self.window_size = window_size
+        self.rewards = []
+        self.smoothed_rewards = []
 
-        self.length_line.set_xdata(range(len(episode_lengths)))
-        self.length_line.set_ydata(episode_lengths)
+        # Initialize the plot
+        plt.ion()
+        self.fig, self.ax = plt.subplots(figsize=figsize)
 
-        # Rescale axes to accommodate new data
-        if self.reward_line.axes is not None:
-            self.reward_line.axes.relim()
-            self.reward_line.axes.autoscale_view()
+        # Plot elements
+        (self.raw_line,) = self.ax.plot(
+            [], [], label="Raw Rewards", color="blue", alpha=0.5
+        )
+        if self.window_size > 1:
+            (self.smoothed_line,) = self.ax.plot(
+                [],
+                [],
+                label=f"Moving Average (window={self.window_size})",
+                color="red",
+                linewidth=2,
+            )
 
-        if self.length_line.axes is not None:
-            self.length_line.axes.relim()
-            self.length_line.axes.autoscale_view()
+        # Configure plot
+        self.ax.set_title("Training Rewards Over Time")
+        self.ax.set_xlabel("Episode")
+        self.ax.set_ylabel("Reward")
+        self.ax.legend()
+        self.ax.grid(True)
+        plt.show()
 
-        plt.draw()
-        plt.pause(0.01)
+    def update(self, reward: float) -> None:
+        """
+        Update the plot with a new reward.
+
+        Args:
+            reward: The latest reward to add.
+        """
+        self.rewards.append(reward)
+        self.raw_line.set_data(range(len(self.rewards)), self.rewards)
+
+        # Update smoothed rewards if window_size > 1
+        if self.window_size > 1 and len(self.rewards) >= self.window_size:
+            self.smoothed_rewards = self._moving_average(
+                self.rewards, self.window_size
+            )
+            # Align the x-axis for smoothed data
+            self.smoothed_line.set_data(
+                range(self.window_size - 1, len(self.rewards)),
+                self.smoothed_rewards,
+            )
+
+        # Adjust plot limits
+        self.ax.relim()
+        self.ax.autoscale_view()
+
+        # Redraw the plot
+        self.fig.canvas.draw()
+        self.fig.canvas.flush_events()
+
+    def _moving_average(
+        self, data: list[float], window_size: int
+    ) -> np.ndarray:
+        """
+        Compute the moving average using a sliding window.
+
+        Args:
+            data: The data points to average.
+            window_size: The size of the moving window.
+
+        Returns:
+            The smoothed data.
+        """
+        return np.convolve(data, np.ones(window_size), "valid") / window_size
+
+    def save_plot(self, filename: str) -> None:
+        """
+        Save the current plot to a file.
+
+        Args:
+            The path to save the plot image.
+        """
+        self.fig.savefig(filename)
