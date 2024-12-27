@@ -24,5 +24,10 @@ training:
   timesteps: 1_000_000    # Total training timesteps
   use_builtin: false      # Use built-in `learn` method (true/false)
 
+  reward_policy:
+    collision: -10         # Reward/penalty if snake collides
+    fruit_eaten: 10        # Reward for eating fruit
+    step: 1                # Reward per step (survival reward)
+
 evaluation:
   episodes: 10             # Number of episodes to evaluate the model

@@ -5,16 +5,20 @@ import numpy as np
 from stable_baselines3 import DQN
 from stable_baselines3.common.evaluation import evaluate_policy
 
-from src.neural import SnakeGameEnv, visualizations
+from src.neural.training.rewards import RewardPolicy
+from src.neural import SnakeGameEnv, visualizations, training
 
 
-def create_snake_env(env_config: dict) -> SnakeGameEnv:
+def create_snake_env(
+    env_config: dict, reward_policy: RewardPolicy
+) -> SnakeGameEnv:
     """Returns the Snake game environment."""
     return SnakeGameEnv(
         cols=env_config["grid_size"],
         rows=env_config["grid_size"],
         width=env_config["width"],
         height=env_config["height"],
+        reward_policy=reward_policy,
         fps=env_config["fps"],
     )
 
@@ -47,7 +51,8 @@ def train_snake_dqn(config: dict) -> None:
     evaluation_config = config["evaluation"]
 
     # Create environment and DQN model
-    env = create_snake_env(env_config)
+    reward_policy = training.RewardPolicy(training_config["reward_policy"])
+    env = create_snake_env(env_config, reward_policy)
     model = create_dqn_model(env, dqn_config)
 
     # Use the built-in learn method if specified

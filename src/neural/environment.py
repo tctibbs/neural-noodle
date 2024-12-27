@@ -6,9 +6,9 @@ import gymnasium as gym
 import numpy as np
 import pygame
 from gymnasium import spaces
-
 from src.noodle import model, view
 from src.noodle.model.entities import Direction
+from src.neural import training
 
 
 class SnakeGameEnv(gym.Env):
@@ -22,9 +22,11 @@ class SnakeGameEnv(gym.Env):
         rows: int,
         width: int,
         height: int,
+        reward_policy: training.RewardPolicy,
         fps: int = 120,
     ) -> None:
-        super(SnakeGameEnv, self).__init__()
+        super().__init__()
+        self.reward_policy = reward_policy
 
         self.cols: int = cols
         self.rows: int = rows
@@ -78,24 +80,15 @@ class SnakeGameEnv(gym.Env):
         curr_state = self.model.play_step(direction)
         obs = self._get_observation()
 
-        truncated = False
+        # By default, not terminated/truncated
         terminated = False
-        # Game over if collision occurs
-        if curr_state.done:
-            reward = -10.0
-            terminated = True
-        # Game over if snake hasn't eaten for 50 turns (time truncation)
-        elif curr_state.turns_since_ate >= 50:
-            print("Game over: 50 turns without eating.")
-            reward = -10.0
-            terminated = True
-            truncated = True
-        # Reward for eating
-        elif curr_state.fruits_eaten > prev_state.fruits_eaten:
-            reward = 10.0
-        else:
-            reward = 1
+        truncated = False
 
+        # Handle the environment's "done" logic (collision)
+        if curr_state.done:
+            terminated = True
+
+        reward = self.reward_policy(prev_state, curr_state)
         info = {}
 
         # Debugging output to track actions and game state
