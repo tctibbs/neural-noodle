@@ -1,7 +1,37 @@
-@startuml
+@startuml "Neural Noodle"
+
+top to bottom direction
 skinparam packageStyle rect
 
-' High-level architecture
+' Draw straight (orthonormal) arrows
+skinparam linetype ortho
+
+' Snake-game-inspired color palette
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+
+' Arrow styling (blue-ish arrows, green-ish font)
+skinparam ArrowColor #0D47A1
+skinparam ArrowThickness 2
+skinparam ArrowFontColor #1B5E20
+
+' Package styling (light blue backgrounds)
+skinparam package {
+  BackgroundColor #BBDEFB
+  BorderColor #0D47A1
+  FontColor #1B5E20
+}
+
+' Class styling (white with blue borders)
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #0D47A1
+  FontColor #212121
+}
+
+' ----------------------------
+' Noodle Package
+' ----------------------------
 package "Noodle Package" {
     package "Model" {
         class GameLogic
@@ -9,7 +39,7 @@ package "Noodle Package" {
         class Snake
         class Fruit
         class Direction
-        class Point
+        class Cell
     }
 
     package "View" {
@@ -22,7 +52,19 @@ package "Noodle Package" {
     }
 }
 
-' Dependencies
+' ----------------------------
+' Neural Package
+' ----------------------------
+package "Neural Package" {
+    class TrainScript
+
+    interface GymnasiumEnv
+    class SnakeGameEnv implements GymnasiumEnv
+}
+
+' ----------------------------
+' Noodle Package Dependencies
+' ----------------------------
 GameController --> GameLogic
 GameController --> GameRenderer
 
@@ -30,15 +72,23 @@ GameLogic --> GameState
 GameLogic --> Snake
 GameLogic --> Fruit
 GameLogic --> Direction
-GameLogic --> Point
+GameLogic --> Cell
 
 Snake --> Direction
-Snake --> Point
+Snake --> Cell
 
-Fruit --> Point
+Fruit --> Cell
 
 GameRenderer --> GameLogic
 GameRenderer --> Snake
 GameRenderer --> Fruit
 GameRenderer --> Colors
+
+' ----------------------------
+' Neural Package Dependencies
+' ----------------------------
+TrainScript --> GymnasiumEnv
+SnakeGameEnv --> GameLogic
+SnakeGameEnv --> GameRenderer
+
 @enduml
