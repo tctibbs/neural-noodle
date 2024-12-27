@@ -1,7 +1,8 @@
-@startuml "Neural Noodle"
+@startuml "architecture"
 
 top to bottom direction
 skinparam packageStyle rect
+allow_mixing
 
 ' Draw straight (orthonormal) arrows
 skinparam linetype ortho
@@ -56,14 +57,21 @@ package "Noodle Package" {
 ' Neural Package
 ' ----------------------------
 package "Neural Package" {
-    class TrainScript
+  component train_model
 
-    package visualizations {
-      class TrainingPlotter
-    }
+  package visualizations {
+    class TrainingPlotter
+  }
+
+  package environment {
+    class RewardPolicy
 
     interface GymnasiumEnv
     class SnakeGameEnv implements GymnasiumEnv
+  }
+
+
+
 }
 
 ' ----------------------------
@@ -91,9 +99,10 @@ GameRenderer --> Colors
 ' ----------------------------
 ' Neural Package Dependencies
 ' ----------------------------
-TrainScript --> GymnasiumEnv
-TrainScript --> TrainingPlotter
+train_model --> visualizations
+train_model --> environment
 SnakeGameEnv --> GameLogic
 SnakeGameEnv --> GameRenderer
+SnakeGameEnv --> RewardPolicy
 
 @enduml

@@ -1,5 +1,7 @@
 """Snake Game wrapper over Gymnasium environment."""
 
+from __future__ import annotations
+
 import copy
 
 import gymnasium as gym
@@ -7,7 +9,7 @@ import numpy as np
 import pygame
 from gymnasium import spaces
 
-from src.neural import training
+from src.neural.environment import RewardPolicy
 from src.noodle import model, view
 from src.noodle.model.entities import Direction
 from src.noodle.model.game_state import GameState
@@ -24,7 +26,7 @@ class SnakeGameEnv(gym.Env):
         rows: int,
         width: int,
         height: int,
-        reward_policy: training.RewardPolicy,
+        reward_policy: RewardPolicy,
     ) -> None:
         super().__init__()
         self.reward_policy = reward_policy
@@ -48,6 +50,19 @@ class SnakeGameEnv(gym.Env):
         self.model = model.GameLogic(self.cols, self.rows)
         self.view = view.GameRenderer(
             self.width, self.height, self.rows, self.cols
+        )
+
+    @staticmethod
+    def from_config(env_config: dict) -> SnakeGameEnv:
+        """Returns the Snake game environment."""
+        reward_policy = RewardPolicy(env_config["reward_policy"])
+
+        return SnakeGameEnv(
+            cols=env_config["grid_size"],
+            rows=env_config["grid_size"],
+            width=env_config["width"],
+            height=env_config["height"],
+            reward_policy=reward_policy,
         )
 
     def reset(
