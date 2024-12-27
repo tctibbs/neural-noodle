@@ -101,3 +101,39 @@ class GameLogic:
         self.state.distance_to_fruit = self.snake.head().distance(
             self.fruit.position()
         )
+        self.state.danger_distances = self._get_distances_to_danger()
+
+    def _get_distances_to_danger(self) -> dict[Direction, int]:
+        """
+        Calculate distances to the nearest wall or snake's body
+        in all four directions: UP, RIGHT, DOWN, LEFT.
+
+        Returns:
+            Dictionary mapping of {Direction, int}.
+        """
+        head = self.snake.head()
+        segments = self.snake.segments()
+
+        # Distances to walls
+        distance_up = head.row  # how many rows until row=0
+        distance_down = (self.rows - 1) - head.row
+        distance_left = head.col  # how many columns until col=0
+        distance_right = (self.cols - 1) - head.col
+
+        # Check for closer snake-body segments
+        for segment in segments[1:]:
+            if segment.col == head.col and segment.row < head.row:
+                distance_up = min(distance_up, head.row - segment.row)
+            elif segment.col == head.col and segment.row > head.row:
+                distance_down = min(distance_down, segment.row - head.row)
+            elif segment.row == head.row and segment.col < head.col:
+                distance_left = min(distance_left, head.col - segment.col)
+            elif segment.row == head.row and segment.col > head.col:
+                distance_right = min(distance_right, segment.col - head.col)
+
+        return {
+            Direction.UP: int(distance_up),
+            Direction.RIGHT: int(distance_right),
+            Direction.DOWN: int(distance_down),
+            Direction.LEFT: int(distance_left),
+        }
