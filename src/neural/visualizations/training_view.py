@@ -17,7 +17,6 @@ class TrainingGameRenderer(GameRenderer):
         model: model.GameLogic,
         score: int,
         q_values: dict | None = None,
-        selected_action: int | None = None,
     ) -> None:
         """
         Renders the game state, including Q-values and other neural visualizations.
@@ -26,17 +25,14 @@ class TrainingGameRenderer(GameRenderer):
             model: The game logic model.
             score: Current score of the game.
             q_values: A dictionary mapping grid cells to Q-values for each action.
-            selected_action: The action chosen by the neural network for the current state.
         """
         super().render(model, score)
 
         # Render neural-specific visualizations
         if q_values is not None:
-            self.render_q_values(q_values, selected_action)
+            self.render_q_values(q_values)
 
-    def render_q_values(
-        self, q_values: dict, selected_action: int | None = None
-    ) -> None:
+    def render_q_values(self, q_values: dict) -> None:
         """
         Renders Q-net scores as percentages for each possible action on the grid.
 
@@ -44,13 +40,20 @@ class TrainingGameRenderer(GameRenderer):
             q_values: A dictionary mapping grid cells to Q-values.
             selected_action: The action chosen by the neural network (optional).
         """
+        # Determine the action with the largest Q-value
+        max_value = max(q_values.values())
+
         for cell, value in q_values.items():
             rect = self._cell_to_rect(cell.row + 1, cell.col + 1)
             x, y = rect.center
 
-            color = (
-                Colors.YELLOW.value if selected_action else Colors.WHITE.value
-            )
+            # Highlight the largest reward action in yellow
+            if value == max_value:
+                color = Colors.YELLOW.value
+            else:
+                color = Colors.WHITE.value
+
+            # Render the Q-value as text
             text = self.font.render(f"{value:.2f}", True, color)
             self.surface.blit(text, (x - 10, y - 5))
 
