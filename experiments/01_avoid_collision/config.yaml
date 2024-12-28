@@ -28,7 +28,7 @@ training:
   # Total training timesteps  
   timesteps: 1_000_000    
   # Number of steps per second
-  steps_per_second: 2 
+  steps_per_second: 1
   # Use built-in `learn` method (true/false)
   use_builtin: false     
 

@@ -68,6 +68,21 @@ class GameLogic:
                 break
         self._fruit = Fruit(fruit_position)
 
+    def get_cell(self, row: int, col: int) -> Cell:
+        """
+        Retrieves a Cell object for the specified row and column indices.
+
+        Args:
+            row: Row index of the cell.
+            col: Column index of the cell.
+
+        Returns:
+            A Cell object representing the specified grid position.
+        """
+        if 0 <= row < self.rows and 0 <= col < self.cols:
+            return Cell(row, col)
+        raise ValueError(f"Invalid cell coordinates: ({row}, {col})")
+
     @property
     def snake(self) -> Snake:
         """Returns the snake object."""

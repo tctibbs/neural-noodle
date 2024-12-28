@@ -49,3 +49,7 @@ class Cell(NamedTuple):
             return abs(self.row - other.row) + abs(self.col - other.col)
         else:
             raise TypeError(f"Unsupported operand type for {type(other)}")
+
+    def __str__(self) -> str:
+        """Returns a neat string representation of the cell."""
+        return f"Cell({self.row},{self.col})"

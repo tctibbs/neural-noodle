@@ -10,7 +10,8 @@ import pygame
 from gymnasium import spaces
 
 from src.neural.environment import RewardPolicy
-from src.noodle import model, view
+from src.noodle import model
+from src.neural.visualizations import TrainingGameRenderer
 from src.noodle.model.entities import Direction
 from src.noodle.model.game_state import GameState
 
@@ -48,7 +49,7 @@ class SnakeGameEnv(gym.Env):
         )
 
         self.model = model.GameLogic(self.cols, self.rows)
-        self.view = view.GameRenderer(
+        self.view = TrainingGameRenderer(
             self.width, self.height, self.rows, self.cols
         )
 
@@ -96,9 +97,9 @@ class SnakeGameEnv(gym.Env):
 
         return obs, reward, terminated, truncated, info
 
-    def render(self, mode: str = "human") -> None:
-        """Render the game state."""
-        self.view.render(self.model, self.model.state.score)
+    def render(self, mode: str = "human", q_values: dict | None = None) -> None:
+        """Render the game state with optional Q-values."""
+        self.view.render(self.model, self.model.state.score, q_values=q_values)
 
     def close(self) -> None:
         """Close the game (e.g., the Pygame window)."""
