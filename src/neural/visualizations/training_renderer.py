@@ -1,3 +1,10 @@
+"""
+Training Renderer Module
+
+This module defines the TrainingRenderer class, which extends the GameRenderer
+class to include training-specific visualizations.
+"""
+
 import pygame
 
 from src.noodle import model
