@@ -7,6 +7,7 @@ visualization of training rewards for reinforcement learning agents.
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.ndimage import gaussian_filter1d
 
 
 class TrainingPlotter:
@@ -25,14 +26,25 @@ class TrainingPlotter:
         self.window_size = window_size
         self.rewards = []
         self.smoothed_rewards = []
+        self.lower_bounds = []
+        self.upper_bounds = []
+
+        # Load custom style
+        plt.style.use("fivethirtyeight")
 
         # Initialize the plot
         plt.ion()
         self.fig, self.ax = plt.subplots(figsize=figsize)
 
         # Plot elements
-        (self.raw_line,) = self.ax.plot(
-            [], [], label="Raw Rewards", color="blue", alpha=0.5
+        self.scatter_points = self.ax.scatter(
+            [],
+            [],
+            label="Raw Rewards",
+            color="blue",
+            alpha=0.4,
+            s=8,
+            marker="d",
         )
         if self.window_size > 1:
             (self.smoothed_line,) = self.ax.plot(
@@ -42,14 +54,36 @@ class TrainingPlotter:
                 color="red",
                 linewidth=2,
             )
+        (self.lower_bound_line,) = self.ax.plot(
+            [],
+            [],
+            label="1st Quartile",
+            color="blue",
+            linestyle="--",
+            linewidth=1.5,
+        )
+        (self.upper_bound_line,) = self.ax.plot(
+            [],
+            [],
+            label="3rd Quartile",
+            color="blue",
+            linestyle="--",
+            linewidth=1.5,
+        )
 
         # Configure plot
         self.ax.set_title("Training Rewards Over Time")
         self.ax.set_xlabel("Episode")
         self.ax.set_ylabel("Reward")
-        self.ax.grid(True, linestyle="--", alpha=0.6)  # Improved gridlines
+        self.ax.grid(True, linestyle="--", alpha=0.6)
         self.ax.spines["top"].set_visible(False)
         self.ax.spines["right"].set_visible(False)
+
+        # Add legend
+        self.ax.legend(
+            loc="upper right", frameon=True, framealpha=0.8, edgecolor="gray"
+        )
+
         plt.tight_layout()
         plt.show()
 
@@ -61,17 +95,23 @@ class TrainingPlotter:
             reward: The latest reward to add.
         """
         self.rewards.append(reward)
-        self.raw_line.set_data(range(len(self.rewards)), self.rewards)
+
+        # Update scatter points
+        self.scatter_points.set_offsets(
+            np.c_[range(len(self.rewards)), self.rewards]
+        )
 
         # Update smoothed rewards if window_size > 1
         if self.window_size > 1:
             self.smoothed_rewards = self._moving_average(
                 self.rewards, self.window_size
             )
-            # Align the x-axis for smoothed data
             self.smoothed_line.set_data(
                 range(len(self.smoothed_rewards)), self.smoothed_rewards
             )
+
+        # Update quartile curves
+        self._update_quartile_curves()
 
         # Adjust plot limits
         self.ax.relim()
@@ -99,6 +139,28 @@ class TrainingPlotter:
             current_window_size = min(window_size, i + 1)
             smoothed.append(np.mean(data[i - current_window_size + 1 : i + 1]))
         return np.array(smoothed)
+
+    def _update_quartile_curves(self) -> None:
+        """
+        Compute and update the curves for 1st and 3rd quartiles with smoothing.
+        """
+        if len(self.rewards) < 2:
+            return
+
+        self.lower_bounds = []
+        self.upper_bounds = []
+        for i in range(1, len(self.rewards) + 1):
+            current_rewards = np.array(self.rewards[:i])
+            self.lower_bounds.append(np.percentile(current_rewards, 25))
+            self.upper_bounds.append(np.percentile(current_rewards, 75))
+
+        # Apply smoothing to the quartile curves
+        self.lower_bounds = gaussian_filter1d(self.lower_bounds, sigma=2)
+        self.upper_bounds = gaussian_filter1d(self.upper_bounds, sigma=2)
+
+        x_range = range(len(self.rewards))
+        self.lower_bound_line.set_data(x_range, self.lower_bounds)
+        self.upper_bound_line.set_data(x_range, self.upper_bounds)
 
     def save_plot(self, filename: str) -> None:
         """

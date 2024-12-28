@@ -53,7 +53,7 @@ def train_model(config: dict) -> None:
     # Initialize tracking variables
     total_reward = 0
     episode_rewards = []
-    training_plotter = visualizations.TrainingPlotter(window_size=10)
+    training_plotter = visualizations.TrainingPlotter(window_size=100)
 
     # Reset the environment
     obs, _ = env.reset()
