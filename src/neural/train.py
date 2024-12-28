@@ -3,10 +3,12 @@
 import time
 
 import numpy as np
+import torch
 from stable_baselines3 import DQN
 from stable_baselines3.common.evaluation import evaluate_policy
 
 from src.neural import environment, visualizations
+from src.noodle.model.entities import Direction
 
 
 def create_dqn_model(env: environment.SnakeGameEnv, dqn_config: dict) -> DQN:
@@ -97,7 +99,26 @@ def train_model(config: dict) -> None:
                 obs, _ = env.reset()
 
             # Render the environment
-            env.render()
+            obs_tensor = torch.tensor(obs, dtype=torch.float32).unsqueeze(0)
+            q_values = model.policy.q_net(obs_tensor).detach().numpy()
+            q_values = q_values.squeeze(0)
+
+            # Map each possible action to the resulting cell
+            snake_head = env.model.snake.head()
+
+            actions = [
+                Direction.UP,
+                Direction.RIGHT,
+                Direction.DOWN,
+                Direction.LEFT,
+            ]
+            q_values_dict = {
+                snake_head.move(action): q_value
+                for action, q_value in zip(actions, q_values)
+            }
+
+            # Render the environment with Q-values for the 4 possible cells
+            env.render(q_values=q_values_dict)
 
             # Maintain the desired FPS
             elapsed_time = time.time() - start_time
