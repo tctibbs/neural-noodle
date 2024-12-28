@@ -4,7 +4,7 @@ from src.noodle import model
 from src.noodle.view import Colors, GameRenderer
 
 
-class TrainingGameRenderer(GameRenderer):
+class TrainingRenderer(GameRenderer):
     """Extends GameRenderer to include training-specific visualizations."""
 
     def __init__(self, width: int, height: int, rows: int, cols: int) -> None:

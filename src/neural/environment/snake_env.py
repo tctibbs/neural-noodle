@@ -11,7 +11,7 @@ from gymnasium import spaces
 
 from src.neural.environment import RewardPolicy
 from src.noodle import model
-from src.neural.visualizations import TrainingGameRenderer
+from src.neural.visualizations import TrainingRenderer
 from src.noodle.model.entities import Direction
 from src.noodle.model.game_state import GameState
 
@@ -49,7 +49,7 @@ class SnakeGameEnv(gym.Env):
         )
 
         self.model = model.GameLogic(self.cols, self.rows)
-        self.view = TrainingGameRenderer(
+        self.view = TrainingRenderer(
             self.width, self.height, self.rows, self.cols
         )
 

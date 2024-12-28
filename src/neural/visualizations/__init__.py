@@ -4,6 +4,6 @@ visualization support for the Neural Noodle project.
 """
 
 from .plotting import TrainingPlotter
-from .training_view import TrainingGameRenderer
+from .training_renderer import TrainingRenderer
 
-__all__ = ["TrainingPlotter", "TrainingGameRenderer"]
+__all__ = ["TrainingPlotter", "TrainingRenderer"]
