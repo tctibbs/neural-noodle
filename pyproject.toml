@@ -32,6 +32,7 @@ ipython = "^8.28.0"
 gymnasium = ">=0.28.1,<0.30"
 stable-baselines3 = "^2.3.2"
 pyyaml = "^6.0.2"
+scipy = "^1.14.1"
 
 # Development dependencies.
 [tool.poetry.dev-dependencies]
