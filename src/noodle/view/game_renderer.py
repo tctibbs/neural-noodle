@@ -36,7 +36,7 @@ class GameRenderer:
 
     def render(self, model: model.GameLogic, score: int) -> None:
         """Renders the game state onto the screen."""
-        self.surface.fill(Colors.BLACK.value)
+        self.surface.fill(Colors.GRAY.value)
         self.render_walls()
         self.render_grid()
         self.render_snake(model.snake)

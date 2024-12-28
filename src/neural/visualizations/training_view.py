@@ -10,7 +10,7 @@ class TrainingGameRenderer(GameRenderer):
     def __init__(self, width: int, height: int, rows: int, cols: int) -> None:
         super().__init__(width, height, rows, cols)
         pygame.font.init()
-        self.font = pygame.font.Font(None, 20)
+        self.font = pygame.font.Font(None, self.cell_size // 2)
 
     def render(
         self,

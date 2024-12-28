@@ -41,89 +41,52 @@ def train_model(config: dict) -> None:
     env = environment.SnakeGameEnv.from_config(config["environment"])
     model = create_dqn_model(env, dqn_config)
 
-    # Set the desired steps per second (FPS)
+    # Setup parameters for training
     steps_per_second = training_config.get("steps_per_second", 10)
     time_per_step = 1.0 / steps_per_second
+    epsilon = dqn_config["exploration_eps"]["initial"]
+    epsilon_decay = (
+        dqn_config["exploration_eps"]["initial"]
+        - dqn_config["exploration_eps"]["final"]
+    ) / (training_config["timesteps"] * dqn_config["exploration_fraction"])
 
-    # Use the built-in learn method if specified
-    if training_config["use_builtin"]:
-        model.learn(total_timesteps=training_config["timesteps"])
-    else:
-        # Initialize tracking variables
-        episode_rewards, episode_lengths = [], []
-        total_reward = 0
+    # Initialize tracking variables
+    total_reward = 0
+    episode_rewards = []
+    training_plotter = visualizations.TrainingPlotter(window_size=10)
 
-        # Setup for real-time plot updates
-        training_plotter = visualizations.TrainingPlotter(window_size=10)
+    # Reset the environment
+    obs, _ = env.reset()
 
-        # Reset the environment
-        obs, _ = env.reset()
+    for step in range(training_config["timesteps"]):
+        start_time = time.time()
 
-        # Training loop
-        epsilon = dqn_config["exploration_eps"][
-            "initial"
-        ]  # Start with full exploration
-        epsilon_decay = (
-            dqn_config["exploration_eps"]["initial"]
-            - dqn_config["exploration_eps"]["final"]
-        ) / (training_config["timesteps"] * dqn_config["exploration_fraction"])
+        # Adjust epsilon for exploration vs. exploitation
+        epsilon = max(
+            dqn_config["exploration_eps"]["final"], epsilon - epsilon_decay
+        )
+        action = (
+            env.action_space.sample()
+            if np.random.rand() < epsilon
+            else model.predict(obs, deterministic=True)[0]
+        )
 
-        for _step in range(training_config["timesteps"]):
-            start_time = time.time()
+        # Take a step in the environment
+        obs, reward, terminated, truncated, _ = env.step(action)
+        total_reward += reward
 
-            # Adjust epsilon based on the step
-            epsilon = max(
-                dqn_config["exploration_eps"]["final"], epsilon - epsilon_decay
-            )
+        # Handle end of episode
+        if terminated or truncated:
+            episode_rewards.append(total_reward)
+            training_plotter.update(total_reward)
+            total_reward = 0
+            obs, _ = env.reset()
 
-            # Choose action based on current epsilon
-            if np.random.rand() < epsilon:
-                action = env.action_space.sample()  # Explore
-            else:
-                action, _ = model.predict(obs, deterministic=True)  # Exploit
+        # Compute and render Q-values
+        render_with_q_values(env, model, obs)
 
-            obs, reward, terminated, truncated, _ = env.step(action)
-
-            total_reward += reward
-
-            if terminated or truncated:
-                # Log the reward and episode length
-                episode_rewards.append(total_reward)
-                episode_lengths.append(len(episode_rewards))
-
-                # Update the plot with the new data
-                training_plotter.update(total_reward)
-
-                # Reset the environment when the episode ends
-                total_reward = 0
-                obs, _ = env.reset()
-
-            # Render the environment
-            obs_tensor = torch.tensor(obs, dtype=torch.float32).unsqueeze(0)
-            q_values = model.policy.q_net(obs_tensor).detach().numpy()
-            q_values = q_values.squeeze(0)
-
-            # Map each possible action to the resulting cell
-            snake_head = env.model.snake.head()
-
-            actions = [
-                Direction.UP,
-                Direction.RIGHT,
-                Direction.DOWN,
-                Direction.LEFT,
-            ]
-            q_values_dict = {
-                snake_head.move(action): q_value
-                for action, q_value in zip(actions, q_values)
-            }
-
-            # Render the environment with Q-values for the 4 possible cells
-            env.render(q_values=q_values_dict)
-
-            # Maintain the desired FPS
-            elapsed_time = time.time() - start_time
-            sleep_time = max(0, time_per_step - elapsed_time)
-            time.sleep(sleep_time)
+        # Maintain desired FPS
+        time.sleep(max(0, time_per_step - (time.time() - start_time)))
 
     # Save the trained model
     model.save("dqn_snake")
@@ -131,8 +94,37 @@ def train_model(config: dict) -> None:
     # Evaluate the model
     evaluate_and_print_results(model, env, evaluation_config["episodes"])
 
-    # Close the environment and turn off interactive plotting
+    # Close the environment
     env.close()
+
+
+def render_with_q_values(
+    env: environment.SnakeGameEnv, model: DQN, obs: np.ndarray
+) -> None:
+    """
+    Renders the environment with Q-values displayed for possible actions.
+
+    Args:
+        env: The game environment.
+        model: The DQN model used for predictions.
+        obs: The current observation from the environment.
+    """
+    # Convert observation to a PyTorch tensor
+    obs_tensor = torch.tensor(obs, dtype=torch.float32).unsqueeze(0)
+
+    # Get Q-values from the model
+    q_values = model.policy.q_net(obs_tensor).detach().numpy().squeeze(0)
+
+    # Map Q-values to the resulting cells
+    snake_head = env.model.snake.head()
+    actions = [Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT]
+    q_values_dict = {
+        snake_head.move(action): q_value
+        for action, q_value in zip(actions, q_values)
+    }
+
+    # Render the environment with Q-values
+    env.render(q_values=q_values_dict)
 
 
 def evaluate_and_print_results(
