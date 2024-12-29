@@ -29,6 +29,9 @@ class GameLogic:
 
     def play_step(self, direction: Direction) -> GameState:
         """Updates the game state based on the player's action."""
+        if direction not in Direction:
+            raise ValueError(f"Invalid direction: {direction}")
+
         self.snake.set_direction(direction)
         self.snake.move()
 

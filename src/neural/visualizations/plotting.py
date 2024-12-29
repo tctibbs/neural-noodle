@@ -142,22 +142,28 @@ class TrainingPlotter:
 
     def _update_quartile_curves(self) -> None:
         """
-        Compute and update the curves for 1st and 3rd quartiles with smoothing.
+        Compute and update the curves for 1st and 3rd quartiles using a rolling window.
         """
         if len(self.rewards) < 2:
             return
 
         self.lower_bounds = []
         self.upper_bounds = []
-        for i in range(1, len(self.rewards) + 1):
-            current_rewards = np.array(self.rewards[:i])
-            self.lower_bounds.append(np.percentile(current_rewards, 25))
-            self.upper_bounds.append(np.percentile(current_rewards, 75))
+
+        for i in range(len(self.rewards)):
+            # Define the rolling window range
+            start_idx = max(0, i - self.window_size + 1)
+            current_window = self.rewards[start_idx : i + 1]
+
+            # Compute the 1st and 3rd quartiles for the rolling window
+            self.lower_bounds.append(np.percentile(current_window, 25))
+            self.upper_bounds.append(np.percentile(current_window, 75))
 
         # Apply smoothing to the quartile curves
         self.lower_bounds = gaussian_filter1d(self.lower_bounds, sigma=2)
         self.upper_bounds = gaussian_filter1d(self.upper_bounds, sigma=2)
 
+        # Update the plot data
         x_range = range(len(self.rewards))
         self.lower_bound_line.set_data(x_range, self.lower_bounds)
         self.upper_bound_line.set_data(x_range, self.upper_bounds)
