@@ -19,12 +19,12 @@ agent:
   learning_rate: 0.001    # Optimizer learning rate
 
   epsilon:
-    start: 0.01             # Starting exploration rate (epsilon-greedy)
-    end: 0.01               # Minimum exploration rate
+    start: 0.00             # Starting exploration rate (epsilon-greedy)
+    end: 0.00               # Minimum exploration rate
     decay_steps: 1000       # Total number of steps for epsilon decay
 
 training:
-  episodes: 1000              # Total number of training episodes
+  episodes: 250               # Total number of training episodes
   steps_per_second: 1000      # Number of steps executed per second
   target_update_interval: 1   # Frequency of target Q-network updates (in episodes)
 
