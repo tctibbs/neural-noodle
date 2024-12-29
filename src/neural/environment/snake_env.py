@@ -41,11 +41,11 @@ class SnakeGameEnv(gym.Env):
         self.action_space = spaces.Discrete(len(Direction))
 
         # Observation space includes:
-        # 1. Direction (0: UP, 1: RIGHT, 2: DOWN, 3: LEFT)
-        # 2. Distance to wall or body in 4 directions (up, right, down, left)
-        # 3. Distance to fruit (Manhattan distance)
+        #   4 one-hot directions
+        #   4 normalized dangers
+        #   1 normalized fruit distance
         self.observation_space: gym.Space = spaces.Box(
-            low=-np.inf, high=np.inf, shape=(6,), dtype=np.float32
+            low=0.0, high=1.0, shape=(9,), dtype=np.float32
         )
 
         self.model = model.GameLogic(self.cols, self.rows)
@@ -65,6 +65,23 @@ class SnakeGameEnv(gym.Env):
             height=env_config["height"],
             reward_policy=reward_policy,
         )
+
+    @property
+    def input_size(self) -> int:
+        """Returns the input size for the neural network."""
+        assert isinstance(
+            self.observation_space, gym.spaces.Box
+        ), "Observation space must be of type Box."
+
+        return int(self.observation_space.shape[0])
+
+    @property
+    def output_size(self) -> int:
+        """Returns the output size for the neural network."""
+        assert isinstance(
+            self.action_space, gym.spaces.Discrete
+        ), "Action space must be of type Discrete."
+        return int(self.action_space.n)
 
     def reset(
         self, seed: int | None = None, options: dict | None = None
@@ -88,13 +105,6 @@ class SnakeGameEnv(gym.Env):
         reward = self.reward_policy(prev_state, curr_state)
         info = {}
 
-        print(
-            f"Reward: {reward:<2}, "
-            f"Turns since ate: {curr_state.turns_since_ate}, "
-            f"Done: {curr_state.done}, "
-            f"Fruits eaten: {curr_state.fruits_eaten}"
-        )
-
         return obs, reward, terminated, truncated, info
 
     def render(self, mode: str = "human", q_values: dict | None = None) -> None:
@@ -106,24 +116,38 @@ class SnakeGameEnv(gym.Env):
         pygame.quit()
 
     def _get_observation(self) -> np.ndarray:
-        """Direction, distance to danger, and distance to fruit."""
+        """Direction (one-hot), distance to danger, and distance to fruit (normalized)."""
         direction = self.model.snake.direction()
         distances_to_danger = list(self.model.state.danger_distances.values())
         distance_to_fruit = self.model.state.distance_to_fruit
 
+        # One-hot encode direction
+        one_hot_direction = [
+            1.0 if direction == dir_enum else 0.0 for dir_enum in Direction
+        ]
+
+        # Normalize distances to danger
+        max_distance = max(self.rows, self.cols)
+        normalized_danger = [
+            min(d / max_distance, 1.0) for d in distances_to_danger
+        ]
+
+        # Normalize distance to fruit
+        max_manhattan_distance = self.rows + self.cols - 2
+        normalized_fruit = min(distance_to_fruit / max_manhattan_distance, 1.0)
+
+        # Combine one-hot direction and normalized features
         observation = np.array(
-            [direction.value] + distances_to_danger + [distance_to_fruit],
+            one_hot_direction + normalized_danger + [normalized_fruit],
             dtype=np.float32,
         )
 
+        # Debug
         print(
-            f"{'Direction:':<10} {direction:<6}"
-            f"{'Distance to danger:':<20}"
-            f"{'Up':<3}{distances_to_danger[0]:<3.0f} "
-            f"{'Right':<6}{distances_to_danger[1]:<3.0f} "
-            f"{'Down':<5}{distances_to_danger[2]:<3.0f} "
-            f"{'Left':<5}{distances_to_danger[3]:<3.0f}"
-            f"{'Distance to fruit:':<18} {distance_to_fruit:.0f}"
+            f"Direction: {one_hot_direction}, "
+            f"Normalized Danger: Up: {normalized_danger[0]:.2f}, Right: {normalized_danger[1]:.2f}, "
+            f"Down: {normalized_danger[2]:.2f}, Left: {normalized_danger[3]:.2f}, "
+            f"Normalized Fruit Distance: {normalized_fruit:.2f}"
         )
 
         return observation

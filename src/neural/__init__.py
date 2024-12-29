@@ -2,4 +2,5 @@
 
 from .environment import SnakeGameEnv
 from . import visualizations
+from . import qnet
 from . import train
