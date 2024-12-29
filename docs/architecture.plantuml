@@ -4,8 +4,8 @@ top to bottom direction
 skinparam packageStyle rect
 allow_mixing
 
-' Draw straight (orthonormal) arrows
-skinparam linetype ortho
+' Draw polyline arrows
+skinparam linetype polyline
 
 ' Snake-game-inspired color palette
 skinparam backgroundColor #FAFAFA
@@ -34,23 +34,36 @@ skinparam class {
 ' Noodle Package
 ' ----------------------------
 package "Noodle Package" {
-    package "Model" {
-        class GameLogic
-        class GameState
-        class Snake
-        class Fruit
-        class Direction
-        class Cell
-    }
+  package "Model" {
+    class GameLogic
+    class GameState
+    class Snake
+    class Fruit
+    class Direction
+    class Cell
 
-    package "View" {
-        class GameRenderer
-        class Colors
-    }
+    GameLogic --> GameState
+    GameLogic --> Snake
+    GameLogic --> Fruit
+    GameLogic --> Direction
+    GameLogic --> Cell
 
-    package "Controller" {
-        class GameController
-    }
+    Snake --> Direction
+    Snake --> Cell
+
+    Fruit --> Cell
+  }
+
+  package "View" {
+    class GameRenderer
+    class Colors
+
+    GameRenderer --> Colors
+  }
+
+  package "Controller" {
+    class GameController
+  }
 }
 
 ' ----------------------------
@@ -61,6 +74,7 @@ package "Neural Package" {
 
   package visualizations {
     class TrainingPlotter
+    class TrainingRenderer
   }
 
   package environment {
@@ -70,39 +84,32 @@ package "Neural Package" {
     class SnakeGameEnv implements GymnasiumEnv
   }
 
+  package qnet {
+    class QModel
+    class QAgent
 
-
+    QAgent --> QModel
+  }
 }
 
 ' ----------------------------
 ' Noodle Package Dependencies
 ' ----------------------------
-GameController --> GameLogic
-GameController --> GameRenderer
-
-GameLogic --> GameState
-GameLogic --> Snake
-GameLogic --> Fruit
-GameLogic --> Direction
-GameLogic --> Cell
-
-Snake --> Direction
-Snake --> Cell
-
-Fruit --> Cell
-
-GameRenderer --> GameLogic
-GameRenderer --> Snake
-GameRenderer --> Fruit
-GameRenderer --> Colors
+Controller --> Model
+Controller --> View
+View --> Model
 
 ' ----------------------------
 ' Neural Package Dependencies
 ' ----------------------------
 train_model --> visualizations
 train_model --> environment
-SnakeGameEnv --> GameLogic
-SnakeGameEnv --> GameRenderer
-SnakeGameEnv --> RewardPolicy
+train_model --> qnet
+
+environment --> visualizations
+environment --> Model
+environment --> View
+
+visualizations --> View
 
 @enduml
