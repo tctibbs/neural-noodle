@@ -27,6 +27,3 @@ training:
   episodes: 250               # Total number of training episodes
   steps_per_second: 1000      # Number of steps executed per second
   target_update_interval: 1   # Frequency of target Q-network updates (in episodes)
-
-evaluation:
-  episodes: 10               # Number of episodes for evaluation
