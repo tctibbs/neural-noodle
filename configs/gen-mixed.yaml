@@ -1,0 +1,68 @@
+# Generalization run: one policy trained on mixed board geometries,
+# evaluated on held-out sizes and aspect ratios it never saw.
+run_name: gen-mixed
+seed: 0
+env:
+  boards:
+    - {width: 8, height: 8}
+    - {width: 12, height: 8}
+    - {width: 8, height: 12}
+    - {width: 10, height: 10}
+    - {width: 12, height: 12}
+    - {width: 10, height: 16}
+    - {width: 16, height: 16}
+  num_envs: 1024
+  start_length: 3
+  starvation_factor: 4.0
+  init_mode: random
+obs:
+  kind: grid
+  egocentric: true
+  body_decay: true
+action:
+  space: egocentric
+reward:
+  fruit: 1.0
+  death: -1.0
+  win: 10.0
+  step_cost: 0.01
+  starve_penalty: 0.0
+  potential_shaping: false
+  shaping_coef: 0.0
+network:
+  channels: 64
+  blocks: 4
+  hidden: 256
+ppo:
+  total_steps: 300000000
+  rollout_len: 128
+  lr: 0.0003
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_coef: 0.2
+  epochs: 2
+  minibatches: 8
+  entropy_coef: 0.01
+  value_coef: 0.5
+  max_grad_norm: 0.5
+  anneal_lr: true
+eval:
+  episodes_per_board: 100
+  boards:
+    # Trained geometries.
+    - {width: 8, height: 8}
+    - {width: 10, height: 10}
+    - {width: 12, height: 12}
+    - {width: 16, height: 16}
+    # Held out: size, aspect ratio, and beyond-training canvas.
+    - {width: 14, height: 14}
+    - {width: 16, height: 8}
+    - {width: 6, height: 6}
+    - {width: 20, height: 20}
+    - {width: 12, height: 20}
+  seed: 7777
+eval_every: 20000000
+quick_eval_episodes: 20
+checkpoint_every: 50000000
+device: cuda
+wandb: false
