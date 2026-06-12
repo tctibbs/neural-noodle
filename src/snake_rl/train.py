@@ -235,7 +235,11 @@ class Trainer:
         self.net.eval()
         out: dict[str, dict[str, float]] = {}
         for board in self.config.eval.boards:
-            canvas = max(board.width, board.height, self.canvas)
+            # Board-exact canvas: a smaller board padded into the
+            # training canvas puts an interior wall band in front of a
+            # policy that never saw one, and it starves (observed at
+            # 20M frames on 8x8 from a 10x10-trained policy).
+            canvas = max(board.width, board.height)
             policy = RLPolicy(
                 self.net,
                 self.config.obs,
