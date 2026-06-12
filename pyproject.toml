@@ -1,63 +1,64 @@
-[tool.poetry]
-# Name and version of the project.
+[project]
 name = "neural-noodle"
 version = "0.1.0"
-
-# Short description of the project.
-description = "A reinforcement learning-based Snake game called Neural Noodle."
-
-# Author information.
-authors = ["Tristan Tibbs <tristantibbs@gmail.com>"]
-
-# License under which the project is distributed.
+description = "Reinforcement learning for Snake, measured against a near-optimal planner."
+authors = [{ name = "Tristan Tibbs", email = "tristantibbs@gmail.com" }]
 license = "MIT"
-
-# Path to the README file for project documentation.
 readme = "README.md"
-
-# Specify where the packages are located in the repository.
-packages = [
-    { include = "neural", from = "src" },
-    { include = "noodle", from = "src" }
+requires-python = ">=3.11"
+dependencies = [
+    "pygame>=2.6.1,<3",
+    "numpy>=1.26,<3",
+    "torch>=2.7,<3",
+    "matplotlib>=3.9.2,<4",
+    "gymnasium>=1.0,<2",
+    "pyyaml>=6.0.2,<7",
+    "scipy>=1.14.1,<2",
+    "loguru>=0.7.2,<1",
+    "pydantic>=2.9,<3",
+    "wandb>=0.19,<1",
 ]
 
-# Production dependencies.
-[tool.poetry.dependencies]
-python = "^3.10"
-pygame = "^2.6.1"
-numpy = "^1.21.0"
-torch = "^2.4.1"
-matplotlib = "^3.9.2"
-ipython = "^8.28.0"
-gymnasium = ">=0.28.1,<0.30"
-pyyaml = "^6.0.2"
-scipy = "^1.14.1"
+[dependency-groups]
+dev = [
+    "ruff>=0.11",
+    "ty",
+    "pytest>=8",
+]
 
-# Development dependencies.
-[tool.poetry.dev-dependencies]
-ruff = "^0.8.4"
-pytest = "^7.4.4"
-
-# Poetry build system requirements.
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/noodle", "src/neural"]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
 
 [tool.ruff]
 line-length = 80
 indent-width = 4
-exclude = ["**/__init__.py"]
+src = ["src"]
 
 [tool.ruff.lint]
-# E: Enforces PEP 8 errors (syntax or structural errors in the code).
-# F: Enforces Pyflakes rules for catching unused imports and variables.
-# W: Enables general warnings for non-standard Python usage.
-# N: Enforces naming convention rules for variables, functions, and classes.
-# BLE: Enforces better list expressions and prevents suboptimal code patterns.
-# B: Enforces bug risk and best practice rules.
-# A: Enforces anti-pattern detection and prevents commonly misused idioms.
-# ICN: Enforces improved code readability and naming conventions.
-# Q: Enforces consistent usage of single or double quotes.
-# PD: Enforces pandas-specific best practices and catches common issues.
-# ANN: Enforces checks for type/return annotations
-select = ["E", "F", "W", "N", "BLE", "B", "A", "ICN", "Q", "PD", 'ANN']
+# E/W: pycodestyle, F: pyflakes, N: naming, B: bugbear, A: builtins,
+# BLE: blind except, ICN: import conventions, Q: quotes, ANN: annotations,
+# I: import sorting, UP: pyupgrade, D: pydocstyle (Google style).
+select = [
+    "E", "F", "W", "N", "BLE", "B", "A", "ICN", "Q", "ANN", "I", "UP", "D",
+]
+ignore = [
+    "D104", # Missing docstring in public package (__init__.py).
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
