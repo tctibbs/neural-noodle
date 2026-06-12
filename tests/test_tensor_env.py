@@ -1,6 +1,4 @@
-"""Lockstep equivalence tests pinning the tensor env to the numpy
-reference implementation.
-"""
+"""Lockstep tests pinning the tensor env to the numpy reference."""
 
 import numpy as np
 import pytest
