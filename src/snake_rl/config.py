@@ -45,6 +45,9 @@ class EnvConfig(BaseModel):
             places it on the top row, which is consistent with the
             planner's Hamiltonian cycle order and is what the fixed
             evaluation protocol uses for every policy.
+        backend: Numpy is the reference simulator and runs everything
+            but training equally well. Tensor steps entirely on the
+            torch device for training throughput (ADR 0005).
     """
 
     boards: list[BoardSpec] = Field(
@@ -55,6 +58,7 @@ class EnvConfig(BaseModel):
     start_length: int = Field(default=3, ge=1)
     starvation_factor: float = Field(default=4.0, gt=0)
     init_mode: Literal["random", "row0"] = "random"
+    backend: Literal["numpy", "tensor"] = "numpy"
 
 
 class ObsConfig(BaseModel):

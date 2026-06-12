@@ -7,6 +7,7 @@ ablations can never change the game rules.
 """
 
 import numpy as np
+import torch
 
 from snake_rl.config import RewardConfig
 from snake_rl.env.vec_env import StepResult, VecSnake
@@ -57,4 +58,42 @@ def compute_rewards(
     if config.potential_shaping:
         not_done = ~result.done
         r += config.shaping_coef * (gamma * phi_after * not_done - phi_before)
+    return r
+
+
+def compute_rewards_t(
+    config: RewardConfig,
+    gamma: float,
+    events: dict[str, torch.Tensor],
+    phi_before: torch.Tensor | None,
+    phi_after: torch.Tensor | None,
+) -> torch.Tensor:
+    """Device-side twin of compute_rewards for the tensor backend.
+
+    Args:
+        config: Reward settings.
+        gamma: Discount factor.
+        events: Bool event tensors from TensorVecSnake.step.
+        phi_before: Potential before the step, or None when shaping
+            is off.
+        phi_after: Potential after the step, or None when shaping is
+            off.
+
+    Returns:
+        Float reward tensor of shape (num_envs,).
+    """
+    ate = events["ate"]
+    r = torch.full_like(ate, 0, dtype=torch.float32) - config.step_cost
+    r = r + config.fruit * ate.float()
+    r = r + config.death * events["died"].float()
+    r = r + config.win * events["won"].float()
+    r = r + config.starve_penalty * events["starved"].float()
+    if config.potential_shaping:
+        if phi_before is None or phi_after is None:
+            msg = "shaping enabled but potentials missing"
+            raise ValueError(msg)
+        not_done = (~events["done"]).float()
+        r = r + config.shaping_coef * (
+            gamma * phi_after * not_done - phi_before
+        )
     return r

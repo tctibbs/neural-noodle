@@ -25,12 +25,13 @@ from snake_rl.config import (
     load_config,
     save_config,
 )
+from snake_rl.env.tensor_env import TensorVecSnake
 from snake_rl.env.vec_env import VecSnake
 from snake_rl.evaluate import aggregate, run_episodes
 from snake_rl.ledger import LedgerRow, append_row
 from snake_rl.logging_setup import setup_logging
 from snake_rl.obs import Features9Builder, GridObsBuilder
-from snake_rl.reward import compute_rewards, potential
+from snake_rl.reward import compute_rewards, compute_rewards_t, potential
 
 
 def load_dotenv(path: Path = Path(".env")) -> None:
@@ -87,8 +88,22 @@ class Trainer:
         seed_everything(config.seed)
         self.device = config.device
 
-        self.env = VecSnake(config.env, seed=config.seed)
         self.canvas = make_canvas(config)
+        self.tensor_backend = config.env.backend == "tensor"
+        if self.tensor_backend and config.obs.kind != "grid":
+            msg = "tensor backend supports grid observations only"
+            raise ValueError(msg)
+        self.env: VecSnake | TensorVecSnake
+        if self.tensor_backend:
+            self.env = TensorVecSnake(
+                config.env,
+                config.obs,
+                self.canvas,
+                seed=config.seed,
+                device=self.device,
+            )
+        else:
+            self.env = VecSnake(config.env, seed=config.seed)
         self.builder: GridObsBuilder | Features9Builder
         if config.obs.kind == "grid":
             self.builder = GridObsBuilder(config.obs, self.canvas)
@@ -112,11 +127,78 @@ class Trainer:
                 config=config.model_dump(mode="json"),
             )
 
+    def collect_rollout_tensor(self) -> tuple[torch.Tensor, ...]:
+        """Collect one rollout entirely on the torch device."""
+        cfg = self.config
+        env = self.env
+        assert isinstance(env, TensorVecSnake)
+        t_len = cfg.ppo.rollout_len
+        b = cfg.env.num_envs
+        dev = self.device
+        s = self.canvas
+        obs_buf = torch.zeros(t_len, b, 4, s, s, device=dev)
+        act_buf = torch.zeros(t_len, b, dtype=torch.long, device=dev)
+        logp_buf = torch.zeros(t_len, b, device=dev)
+        rew_buf = torch.zeros(t_len, b, device=dev)
+        done_buf = torch.zeros(t_len, b, device=dev)
+        val_buf = torch.zeros(t_len, b, device=dev)
+        shaping = cfg.reward.potential_shaping
+        ego = cfg.action.space == "egocentric"
+
+        for t in range(t_len):
+            obs = env.observe()
+            with torch.no_grad():
+                logits, value = self.net(obs)
+                dist = Categorical(logits=logits)
+                action = dist.sample()
+                logp = dist.log_prob(action)
+            if ego:
+                absolute = (env.direction + action - 1) % 4
+            else:
+                absolute = action
+            phi_before = env.potential() if shaping else None
+            events = env.step(absolute)
+            phi_after = env.potential() if shaping else None
+            rewards = compute_rewards_t(
+                cfg.reward, cfg.ppo.gamma, events, phi_before, phi_after
+            )
+            obs_buf[t] = obs
+            act_buf[t] = action
+            logp_buf[t] = logp
+            rew_buf[t] = rewards
+            done_buf[t] = events["done"].float()
+            val_buf[t] = value
+        self.frames += t_len * b
+        self.recent.extend(env.drain_finished())
+
+        with torch.no_grad():
+            _, last_value = self.net(env.observe())
+        adv_buf = torch.zeros(t_len, b, device=dev)
+        last_gae = torch.zeros(b, device=dev)
+        for t in reversed(range(t_len)):
+            nnt = 1.0 - done_buf[t]
+            nv = last_value if t == t_len - 1 else val_buf[t + 1]
+            delta = rew_buf[t] + cfg.ppo.gamma * nv * nnt - val_buf[t]
+            last_gae = (
+                delta + cfg.ppo.gamma * cfg.ppo.gae_lambda * nnt * last_gae
+            )
+            adv_buf[t] = last_gae
+        ret_buf = adv_buf + val_buf
+        return (
+            obs_buf.reshape(t_len * b, 4, s, s),
+            act_buf.reshape(-1),
+            logp_buf.reshape(-1),
+            adv_buf.reshape(-1),
+            ret_buf.reshape(-1),
+        )
+
     def collect_rollout(
         self,
     ) -> tuple[torch.Tensor, ...]:
         """Collect one rollout and return flattened training tensors."""
         cfg = self.config
+        env = self.env
+        assert isinstance(env, VecSnake)
         t_len = cfg.ppo.rollout_len
         b = cfg.env.num_envs
         obs_buf: list[torch.Tensor] = []
@@ -127,21 +209,21 @@ class Trainer:
         val_buf = torch.zeros(t_len, b)
 
         for t in range(t_len):
-            obs_np = self.builder.build(self.env)
+            obs_np = self.builder.build(env)
             obs = torch.from_numpy(obs_np).to(self.device)
             with torch.no_grad():
                 logits, value = self.net(obs)
                 dist = Categorical(logits=logits)
                 action = dist.sample()
                 logp = dist.log_prob(action)
-            phi_before = potential(self.env)
-            absolute = to_absolute(cfg.action, action.cpu().numpy(), self.env)
-            result = self.env.step(absolute)
-            phi_after = potential(self.env)
+            phi_before = potential(env)
+            absolute = to_absolute(cfg.action, action.cpu().numpy(), env)
+            result = env.step(absolute)
+            phi_after = potential(env)
             rewards = compute_rewards(
                 cfg.reward, cfg.ppo.gamma, result, phi_before, phi_after
             )
-            self.recent.extend(self.env.drain_finished())
+            self.recent.extend(env.drain_finished())
 
             obs_buf.append(obs)
             act_buf[t] = action.cpu()
@@ -152,9 +234,7 @@ class Trainer:
         self.frames += t_len * b
 
         with torch.no_grad():
-            last_obs = torch.from_numpy(self.builder.build(self.env)).to(
-                self.device
-            )
+            last_obs = torch.from_numpy(self.builder.build(env)).to(self.device)
             _, last_value = self.net(last_obs)
         adv_buf = torch.zeros(t_len, b)
         last_gae = torch.zeros(b)
@@ -293,7 +373,10 @@ class Trainer:
                 frac = 1.0 - (it - 1) / iterations
                 for group in self.optimizer.param_groups:
                     group["lr"] = cfg.ppo.lr * frac
-            tensors = self.collect_rollout()
+            if self.tensor_backend:
+                tensors = self.collect_rollout_tensor()
+            else:
+                tensors = self.collect_rollout()
             losses = self.update(*tensors)
             if it % 10 == 0 or it == 1:
                 sps = self.frames / (time.perf_counter() - self.start_time)

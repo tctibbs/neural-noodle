@@ -1,0 +1,53 @@
+# Tiny smoke run: verifies the training loop end to end in about a
+# minute. Not a result.
+run_name: smoke-tensor
+seed: 0
+env:
+  boards:
+    - {width: 8, height: 8}
+  num_envs: 1024
+  start_length: 3
+  starvation_factor: 4.0
+  init_mode: random
+  backend: tensor
+obs:
+  kind: grid
+  egocentric: true
+  body_decay: true
+action:
+  space: egocentric
+reward:
+  fruit: 1.0
+  death: -1.0
+  win: 10.0
+  step_cost: 0.01
+  starve_penalty: 0.0
+  potential_shaping: false
+  shaping_coef: 0.0
+network:
+  channels: 32
+  blocks: 2
+  hidden: 128
+ppo:
+  total_steps: 6000000
+  rollout_len: 64
+  lr: 0.0003
+  gamma: 0.99
+  gae_lambda: 0.95
+  clip_coef: 0.2
+  epochs: 2
+  minibatches: 4
+  entropy_coef: 0.01
+  value_coef: 0.5
+  max_grad_norm: 0.5
+  anneal_lr: true
+eval:
+  episodes_per_board: 20
+  boards:
+    - {width: 8, height: 8}
+  seed: 7777
+eval_every: 5000000
+quick_eval_episodes: 10
+checkpoint_every: 6000000
+device: cuda
+wandb: false
