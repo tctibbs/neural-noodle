@@ -36,10 +36,17 @@ class PlannerEvalConfig(BaseModel):
     max_fill: float = 0.5
     boards: list[BoardSpec] = Field(
         default_factory=lambda: [
+            BoardSpec(width=6, height=6),
             BoardSpec(width=8, height=8),
+            BoardSpec(width=9, height=12),
             BoardSpec(width=10, height=10),
             BoardSpec(width=12, height=12),
+            BoardSpec(width=14, height=14),
+            BoardSpec(width=16, height=8),
             BoardSpec(width=16, height=16),
+            BoardSpec(width=18, height=18),
+            BoardSpec(width=20, height=20),
+            BoardSpec(width=24, height=24),
         ]
     )
     episodes: int = 100
