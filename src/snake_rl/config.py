@@ -94,6 +94,8 @@ class RewardConfig(BaseModel):
         death: Penalty applied on death.
         win: Bonus for filling the board completely.
         step_cost: Per-step cost applying efficiency pressure.
+        starve_penalty: Penalty when the starvation cap ends the
+            episode. Zero treats starvation as a plain timeout.
         potential_shaping: Add potential-based shaping on the
             Manhattan distance from head to fruit.
         shaping_coef: Scale of the potential-based shaping term.
@@ -103,6 +105,7 @@ class RewardConfig(BaseModel):
     death: float = -1.0
     win: float = 10.0
     step_cost: float = 0.01
+    starve_penalty: float = 0.0
     potential_shaping: bool = False
     shaping_coef: float = 0.0
 
@@ -189,6 +192,8 @@ class TrainConfig(BaseModel):
         ppo: Algorithm settings.
         eval: Evaluation protocol settings.
         eval_every: Environment steps between evaluation passes.
+        quick_eval_episodes: Episodes per board for evaluations during
+            training. The final evaluation uses the full protocol.
         checkpoint_every: Environment steps between checkpoints.
         device: Torch device string.
         wandb: Mirror metrics to Weights and Biases. The ledger stays
@@ -205,6 +210,7 @@ class TrainConfig(BaseModel):
     ppo: PPOConfig = Field(default_factory=PPOConfig)
     eval: EvalConfig = Field(default_factory=EvalConfig)
     eval_every: int = Field(default=2_000_000, ge=1)
+    quick_eval_episodes: int = Field(default=20, ge=1)
     checkpoint_every: int = Field(default=10_000_000, ge=1)
     device: str = "cuda"
     wandb: bool = False
