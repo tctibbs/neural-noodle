@@ -144,6 +144,9 @@ class PPOConfig(BaseModel):
         value_coef: Value loss coefficient.
         max_grad_norm: Gradient clipping norm.
         anneal_lr: Linearly decay the learning rate to zero.
+        amp: Use bfloat16 autocast and channels-last layout on CUDA.
+            Halves update time on tensor-core GPUs; losses and the
+            action distribution stay in float32.
     """
 
     total_steps: int = Field(default=100_000_000, ge=1)
@@ -158,6 +161,7 @@ class PPOConfig(BaseModel):
     value_coef: float = Field(default=0.5, ge=0)
     max_grad_norm: float = Field(default=0.5, gt=0)
     anneal_lr: bool = True
+    amp: bool = True
 
 
 class EvalConfig(BaseModel):

@@ -109,7 +109,12 @@ class Trainer:
             self.builder = GridObsBuilder(config.obs, self.canvas)
         else:
             self.builder = Features9Builder(config.obs)
+        self.amp = config.ppo.amp and self.device.startswith("cuda")
+        if self.device.startswith("cuda"):
+            torch.backends.cudnn.benchmark = True
         self.net = build_network(config).to(self.device)
+        if self.amp and config.obs.kind == "grid":
+            self.net = self.net.to(memory_format=torch.channels_last)
         self.optimizer = torch.optim.Adam(
             self.net.parameters(), lr=config.ppo.lr, eps=1e-5
         )
@@ -147,8 +152,19 @@ class Trainer:
 
         for t in range(t_len):
             obs = env.observe()
+            net_in = (
+                obs.contiguous(memory_format=torch.channels_last)
+                if self.amp
+                else obs
+            )
+            with (
+                torch.no_grad(),
+                torch.autocast("cuda", dtype=torch.bfloat16, enabled=self.amp),
+            ):
+                logits, value = self.net(net_in)
+            logits = logits.float()
+            value = value.float()
             with torch.no_grad():
-                logits, value = self.net(obs)
                 dist = Categorical(logits=logits)
                 action = dist.sample()
                 logp = dist.log_prob(action)
@@ -171,8 +187,12 @@ class Trainer:
         self.frames += t_len * b
         self.recent.extend(env.drain_finished())
 
-        with torch.no_grad():
+        with (
+            torch.no_grad(),
+            torch.autocast("cuda", dtype=torch.bfloat16, enabled=self.amp),
+        ):
             _, last_value = self.net(env.observe())
+        last_value = last_value.float()
         adv_buf = torch.zeros(t_len, b, device=dev)
         last_gae = torch.zeros(b, device=dev)
         for t in reversed(range(t_len)):
@@ -282,7 +302,15 @@ class Trainer:
             idx = idx[torch.randperm(n, device=self.device)]
             for start in range(0, n, mb_size):
                 mb = idx[start : start + mb_size]
-                logits, values = self.net(flat_obs[mb])
+                batch = flat_obs[mb]
+                if self.amp and batch.dim() == 4:
+                    batch = batch.contiguous(memory_format=torch.channels_last)
+                with torch.autocast(
+                    "cuda", dtype=torch.bfloat16, enabled=self.amp
+                ):
+                    logits, values = self.net(batch)
+                logits = logits.float()
+                values = values.float()
                 dist = Categorical(logits=logits)
                 logp = dist.log_prob(actions[mb])
                 ratio = (logp - old_logp[mb]).exp()
