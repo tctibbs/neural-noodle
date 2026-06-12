@@ -55,6 +55,7 @@ select = [
 ]
 ignore = [
     "D104", # Missing docstring in public package (__init__.py).
+    "D107", # Init args are documented in the class docstring.
 ]
 
 [tool.ruff.lint.pydocstyle]
