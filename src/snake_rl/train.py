@@ -224,9 +224,9 @@ class Trainer:
                     self.net.parameters(), cfg.max_grad_norm
                 )
                 self.optimizer.step()
-                stats["policy_loss"] += float(policy_loss)
-                stats["value_loss"] += float(value_loss)
-                stats["entropy"] += float(entropy)
+                stats["policy_loss"] += float(policy_loss.detach())
+                stats["value_loss"] += float(value_loss.detach())
+                stats["entropy"] += float(entropy.detach())
                 count += 1
         return {k: v / count for k, v in stats.items()}
 

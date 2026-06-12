@@ -63,3 +63,8 @@ cython_debug/
 # Others
 *.spec
 *.manifest
+
+# Training outputs (checkpoints and logs; the ledger is committed)
+runs/
+*.pt
+videos/

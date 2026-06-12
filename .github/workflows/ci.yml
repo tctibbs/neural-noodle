@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Sync
+        run: uv sync
+      - name: Ruff lint
+        run: uv run ruff check src/snake_rl tests
+      - name: Ruff format
+        run: uv run ruff format --check src/snake_rl tests
+      - name: Ty
+        run: uv run ty check src/snake_rl
+      - name: Tests
+        run: uv run pytest tests -q
