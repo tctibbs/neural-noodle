@@ -114,7 +114,11 @@ class Trainer:
             torch.backends.cudnn.benchmark = True
         self.net = build_network(config).to(self.device)
         if self.amp and config.obs.kind == "grid":
-            self.net = self.net.to(memory_format=torch.channels_last)
+            # Stubs for Module.to omit the memory_format kwarg that
+            # exists at runtime.
+            self.net = self.net.to(  # ty: ignore[no-matching-overload]
+                memory_format=torch.channels_last
+            )
         self.optimizer = torch.optim.Adam(
             self.net.parameters(), lr=config.ppo.lr, eps=1e-5
         )
