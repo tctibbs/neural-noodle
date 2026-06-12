@@ -1,4 +1,4 @@
-﻿# Main efficiency run on a fixed 10x10 board.
+# Main efficiency run on a fixed 10x10 board.
 run_name: abl-obs-features9
 seed: 0
 env:

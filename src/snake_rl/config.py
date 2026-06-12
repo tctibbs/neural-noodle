@@ -251,7 +251,7 @@ def load_config(path: Path) -> TrainConfig:
     Returns:
         The validated configuration.
     """
-    with path.open() as fh:
+    with path.open(encoding="utf-8-sig") as fh:
         raw = yaml.safe_load(fh)
     return TrainConfig.model_validate(raw)
 

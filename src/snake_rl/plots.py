@@ -86,15 +86,19 @@ def plot_run(rows: list[LedgerRow], run_name: str, out_dir: Path) -> list[Path]:
         for b_idx, (board, seeds) in enumerate(sorted(curves.items())):
             series = []
             for points in seeds.values():
-                pts = sorted(points)
+                # Keep the last row per frame count (a post-hoc
+                # checkpoint eval supersedes the in-run one).
+                by_frames = dict(sorted((p[0], p) for p in points))
+                pts = list(by_frames.values())
                 series.append(
                     (
                         np.array([p[0] for p in pts], dtype=float),
                         np.array([p[metric] for p in pts], dtype=float),
                     )
                 )
-            frames = series[0][0]
-            values = np.stack([s[1] for s in series])
+            common = min(len(s[0]) for s in series)
+            frames = series[0][0][:common]
+            values = np.stack([s[1][:common] for s in series])
             mean = values.mean(axis=0)
             color = colors(b_idx)
             ax.plot(frames / 1e6, mean, label=board, color=color)
