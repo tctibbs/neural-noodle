@@ -68,3 +68,6 @@ cython_debug/
 runs/
 *.pt
 videos/
+
+# Regenerable during the campaign; final figures land in docs/figures
+plots/

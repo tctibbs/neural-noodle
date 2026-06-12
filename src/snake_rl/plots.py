@@ -16,6 +16,11 @@ import numpy as np
 
 from snake_rl.ledger import DEFAULT_LEDGER, LedgerRow, read_rows
 
+# In-run eval rows measured under the pre-fix canvas convention (see
+# journal/2026-06-12-canvas-ood-bug.md). The ledger keeps them; plots
+# skip them. (run_id, board) pairs.
+INVALID_EVAL: set[tuple[str, str]] = {("7d9d5a3f51", "8x8")}
+
 
 def eval_curves(
     rows: list[LedgerRow], run_name: str
@@ -39,6 +44,8 @@ def eval_curves(
         ):
             continue
         board = str(row.extra.get("board", "?"))
+        if (row.run_id, board) in INVALID_EVAL:
+            continue
         curves[board][row.seed].append(
             (
                 row.frames,
@@ -96,9 +103,13 @@ def plot_run(rows: list[LedgerRow], run_name: str, out_dir: Path) -> list[Path]:
                         np.array([p[metric] for p in pts], dtype=float),
                     )
                 )
-            common = min(len(s[0]) for s in series)
-            frames = series[0][0][:common]
-            values = np.stack([s[1][:common] for s in series])
+            # Seeds with a partial series (for example only a post-hoc
+            # final eval) would truncate every other seed; keep only
+            # seeds with the fullest curve.
+            full = max(len(s[0]) for s in series)
+            series = [s for s in series if len(s[0]) == full]
+            frames = series[0][0]
+            values = np.stack([s[1] for s in series])
             mean = values.mean(axis=0)
             color = colors(b_idx)
             ax.plot(frames / 1e6, mean, label=board, color=color)
@@ -121,6 +132,8 @@ def plot_run(rows: list[LedgerRow], run_name: str, out_dir: Path) -> list[Path]:
                 )
         ax.set_xlabel("frames (millions)")
         ax.set_ylabel(label)
+        if metric_idx == 0:
+            ax.set_yscale("log")
         title = f"{run_name}: {label}"
         if metric_idx == 0:
             title += " (dashed: shortcut planner)"
