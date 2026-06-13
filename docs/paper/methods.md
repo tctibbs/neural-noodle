@@ -63,18 +63,34 @@ row0 eval init is a strict subset of the training distribution.
 
 ## Experiments
 
-- Main: three seeds on 10x10, 150M frames each. TODO results.
+All measured results are in results.md and trace to the ledger.
+
+- Main: three seeds on 10x10, 150M frames each, numpy backend.
 - Ablations, one variable at a time against the main configuration,
   50M frames: legacy 9-feature observation, binary body plane,
   allocentric observation, absolute action space, no step cost,
-  potential-based fruit-distance shaping. TODO results.
-- Generalization: one policy trained on seven mixed geometries
-  (8x8 through 16x16, mixed aspect ratios), evaluated on held-out
-  14x14, 16x8, 6x6, 20x20, and 12x20 boards. TODO results.
+  potential-based fruit-distance shaping.
+- Generalization: one policy trained on eight mixed geometries
+  (8x8 through 16x16, mixed aspect ratios), 500M frames on the
+  tensor backend, evaluated on held-out 6x6, 9x12, 14x14, and 16x8
+  plus extrapolation boards 18x18, 20x20, and 24x24 beyond the
+  training canvas.
+
+## Environment backends
+
+Two rule-identical simulators share one specification: a numpy
+reference (also the substrate for the planner, baselines, and all
+evaluation) and a torch tensor backend whose step and observation
+build run entirely on the device. Lockstep tests assert identical
+events and state from identical pre-states across randomized
+rollouts, and identical observations in every observation
+configuration. The tensor backend trains with 16384 environments,
+bfloat16 autocast, and channels-last layout.
 
 ## Hardware and reproducibility
 
 Windows 11, RTX 5080 (16 GB), torch 2.11 cu128, Python 3.12, uv
-lockfile. Single process, about 36k environment steps per second.
-Every run stamps its config hash, git SHA, seed, frame count, and
-wall clock into the ledger.
+lockfile. Numpy backend: about 36k environment steps per second at
+1024 envs. Tensor backend: about 101k at canvas 10 and 43k at
+canvas 16. Every run stamps its config hash, git SHA, seed, frame
+count, and wall clock into the ledger.
