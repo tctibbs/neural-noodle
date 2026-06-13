@@ -18,6 +18,11 @@ jobs:
       - name: Ruff format
         run: uv run ruff format --check src/neural tests
       - name: Ty
-        run: uv run ty check src/neural
+        # --extra-search-path makes ty resolve the first-party `neural`
+        # package from the src layout. ty 0.0.49 auto-detects this on
+        # some platforms but not on Linux, and its config keys for the
+        # source root postdate this version, so the flag is the portable
+        # way to pin it.
+        run: uv run ty check --extra-search-path src src/neural
       - name: Tests
         run: uv run pytest tests -q

@@ -69,7 +69,7 @@ uv run python -m neural.plots --out plots
 
 Checks: `uv run ruff check src/neural tests`,
 `uv run ruff format --check src/neural tests`,
-`uv run ty check src/neural`.
+`uv run ty check --extra-search-path src src/neural`.
 
 ## License
 
