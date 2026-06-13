@@ -2,8 +2,8 @@
 
 # Neural Noodle
 
-A reinforcement learning agent that learns to play Snake, and an
-honest look at how good (and how limited) it actually is.
+A reinforcement learning agent that learns to play Snake, measured
+against a near-optimal classical solver.
 
 ![One policy across four board sizes](docs/demo.gif)
 
