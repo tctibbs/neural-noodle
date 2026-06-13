@@ -106,13 +106,10 @@ class TensorVecSnake:
             rows = torch.zeros(n, dtype=torch.long, device=dev)
         else:
             rows = (
-                torch.rand(n, generator=self.gen, device=dev)
-                * hw[:, 0]
+                torch.rand(n, generator=self.gen, device=dev) * hw[:, 0]
             ).long()
         col_span = hw[:, 1] - start + 1
-        col0 = (
-            torch.rand(n, generator=self.gen, device=dev) * col_span
-        ).long()
+        col0 = (torch.rand(n, generator=self.gen, device=dev) * col_span).long()
 
         self.occ[idx] = False
         ks = torch.arange(start, device=dev)
@@ -141,9 +138,9 @@ class TensorVecSnake:
         cols = self._slots[None, :] % self.max_w
         on_board = (rows < h[:, None]) & (cols < w[:, None])
         free = on_board & ~self.occ[idx]
-        choice = torch.multinomial(
-            free.float(), 1, generator=self.gen
-        ).squeeze(1)
+        choice = torch.multinomial(free.float(), 1, generator=self.gen).squeeze(
+            1
+        )
         self.fruit[idx, 0] = choice // self.max_w
         self.fruit[idx, 1] = choice % self.max_w
 
@@ -208,7 +205,9 @@ class TensorVecSnake:
         self.length = self.length + (ate & move).long()
         self.steps = self.steps + move.long()
         self.since_fruit = torch.where(
-            ate, torch.zeros_like(self.since_fruit), self.since_fruit + move.long()
+            ate,
+            torch.zeros_like(self.since_fruit),
+            self.since_fruit + move.long(),
         )
         self.apples = self.apples + ate.long()
 
@@ -311,9 +310,7 @@ class TensorVecSnake:
         else:
             values = torch.ones_like(rel, dtype=torch.float32)
         body_idx = self.body[:, :, 0] * s + self.body[:, :, 1]
-        body_idx = torch.where(
-            valid, body_idx, torch.full_like(body_idx, area)
-        )
+        body_idx = torch.where(valid, body_idx, torch.full_like(body_idx, area))
         obs[:, 0].scatter_(1, body_idx, values * valid.float())
 
         head = self.head
@@ -337,9 +334,7 @@ class TensorVecSnake:
     def _canvas_rows(self) -> torch.Tensor:
         """Row index per flat canvas cell, shape (1, canvas*canvas)."""
         s = self.canvas
-        return (
-            torch.arange(s * s, device=self.device)[None, :] // s
-        )
+        return torch.arange(s * s, device=self.device)[None, :] // s
 
     def _canvas_cols(self) -> torch.Tensor:
         """Col index per flat canvas cell, shape (1, canvas*canvas)."""

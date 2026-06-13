@@ -146,9 +146,7 @@ class VecSnake:
         Returns:
             Array of shape (length, 2).
         """
-        idx = (
-            self.tail_i[i] + np.arange(self.length[i])
-        ) % self.capacity
+        idx = (self.tail_i[i] + np.arange(self.length[i])) % self.capacity
         return self.body[i, idx]
 
     def drain_finished(self) -> list[EpisodeStats]:
