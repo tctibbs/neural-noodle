@@ -72,24 +72,29 @@ config hash.
 
 ## Generalization campaign
 
-One policy (gen-mixed-tensor, 500M frames, eight training geometries
-up to 16x16, canvas 16), final 100-episode eval per board. Boards
-marked held-out were never trained on; the last three exceed the
-training canvas entirely.
+One policy (gen-mixed-tensor, two seeds, 500M frames each, eight
+training geometries up to 16x16, canvas 16), final 100-episode eval
+per board, mean +- spread over seeds. Boards marked held-out were
+never trained on; the last three exceed the training canvas entirely.
+Oracle is the shortcut planner (100 percent wins on every board).
 
-| Board | status      | spa   | fill | win | oracle spa |
-| ----- | ----------- | ----- | ---- | --- | ---------- |
-| 6x6   | held out    | 4.70  | 99%  | 96% | 6.6        |
-| 8x8   | trained     | 6.56  | 98%  | 95% | 10.4       |
-| 9x12  | held out    | 9.45  | 95%  | 82% | 16.2       |
-| 10x10 | trained     | 8.51  | 96%  | 92% | 15.1       |
-| 12x12 | trained     | 10.93 | 85%  | 66% | 20.7       |
-| 14x14 | held out    | 13.24 | 75%  | 43% | 27.1       |
-| 16x8  | held out    | 10.34 | 91%  | 79% | 18.9       |
-| 16x16 | trained     | 15.94 | 62%  | 17% | 34.9       |
-| 18x18 | extrapolation | 18.00 | 49% | 5%  | 43.2       |
-| 20x20 | extrapolation | 20.25 | 39% | 0%  | 52.8       |
-| 24x24 | extrapolation | 46.0 (noisy) | 23% | 0% | 74.8 |
+| Board | status        | spa            | fill        | win        | oracle spa |
+| ----- | ------------- | -------------- | ----------- | ---------- | ---------- |
+| 6x6   | held out      | 4.75 +- 0.05   | 99% +- 0%   | 97% +- 1%  | 6.6        |
+| 8x8   | trained       | 6.53 +- 0.02   | 99% +- 0%   | 96% +- 1%  | 10.4       |
+| 9x12  | held out      | 9.36 +- 0.09   | 95% +- 1%   | 84% +- 3%  | 16.2       |
+| 10x10 | trained       | 8.56 +- 0.04   | 96% +- 0%   | 91% +- 2%  | 15.1       |
+| 12x12 | trained       | 10.91 +- 0.01  | 86% +- 1%   | 65% +- 1%  | 20.7       |
+| 14x14 | held out      | 13.34 +- 0.10  | 74% +- 0%   | 38% +- 5%  | 27.1       |
+| 16x8  | held out      | 10.42 +- 0.09  | 91% +- 0%   | 78% +- 1%  | 18.9       |
+| 16x16 | trained       | 15.97 +- 0.03  | 63% +- 1%   | 17% +- 0%  | 34.9       |
+| 18x18 | extrapolation | 18.00 +- 0.00  | 48% +- 1%   | 3% +- 2%   | 43.2       |
+| 20x20 | extrapolation | 20.09 +- 0.16  | 39% +- 0%   | 0%         | 52.8       |
+| 24x24 | extrapolation | 34.7 +- 11.2 (noisy) | 24% +- 1% | 0%   | 74.8       |
+
+Across two seeds the spread is small everywhere except the 24x24
+extrapolation tail, so the pattern below is a property of the method,
+not a single lucky run.
 
 Three observations. First, held-out interpolation boards are
 statistically indistinguishable from trained boards of similar size:
@@ -104,6 +109,6 @@ extrapolation degrades gracefully in fill (49, 39, 23 percent at
 the single-board policy showed beyond 1.4x its training area.
 
 The mixed-geometry policy also beats the three dedicated 10x10
-seeds on their own board within noise (92 versus 78 +- 4 percent
-wins), so geometry diversity cost nothing on the home board and
-bought the entire transfer envelope.
+seeds on their own board (91 +- 2 versus 78 +- 4 percent wins), so
+geometry diversity cost nothing on the home board and bought the
+entire transfer envelope.

@@ -11,9 +11,10 @@ Grounded in the ledger; no claim here exceeds what was measured.
   (legacy observation at 8 percent fill versus 64 percent); the
   reward-side effects are within plausible single-seed noise and are
   not claimed as significant.
-- The generalization headline is being lifted from one seed to two
-  (gen-mixed-tensor seed 1 in progress) to report mean and spread,
-  matching the bar applied to the single-board result.
+- The generalization headline is two seeds, reported as mean and
+  spread. The two seeds agree tightly (per-board win-rate spread at
+  or below 5 points except the 24x24 extrapolation tail), so the
+  transfer pattern is a method property rather than a single run.
 
 ## Measurement
 
