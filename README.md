@@ -5,6 +5,18 @@
 Efficiency-oriented reinforcement learning for Snake, measured against
 a near-optimal classical planner.
 
+## The capability frontier
+
+![One policy across four board sizes](docs/demo.gif)
+
+One policy (trained on mixed geometries up to 16x16) playing four
+board sizes at once. It fills and wins the small boards efficiently,
+and the limit is visible on the right: beyond its training scale it
+stays direct toward fruit but stalls before completing the board
+(16x16 at 71 percent fill, 20x20 at 22 percent). Playback is
+time-normalized, so the larger boards, whose real episodes are much
+longer, are shown sped up; each panel reports its true final outcome.
+
 ## Why efficiency, not score
 
 Snake has a trivial unbeatable classical solution: follow a
