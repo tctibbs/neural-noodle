@@ -53,10 +53,17 @@ percent fill, spa 9.9, no wins yet.
 
 The representation pairing (egocentric grid plus turn actions) is
 the dominant driver. The body time-to-vacate channel buys
-efficiency specifically (spa 9.9 versus 11.2 at par fill). Reward
-details are second-order at this budget; a longer sparse-reward run
-is required before claiming the step cost is dispensable, since the
-main run's efficiency gains concentrated after 60M frames.
+efficiency specifically (spa 9.9 versus 11.2 at par fill).
+
+The step cost is dispensable at full budget. Rerun at 150M frames
+(matching the main budget), the sparse-reward configuration reaches
+spa 9.08, fill 95 percent, win 76 percent on 10x10, against the
+step-cost main run's 8.94, 93 percent, 78 percent (+- 4 percent
+across seeds). The difference is within seed noise: efficiency
+emerges from the fruit reward and the fact that death ends the
+stream of future fruit, not from the explicit per-step penalty. The
+step cost neither helps nor hurts measurably on the home board, so
+the headline result does not depend on reward shaping.
 
 ## Tensor backend validation
 

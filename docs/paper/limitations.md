@@ -10,7 +10,10 @@ Grounded in the ledger; no claim here exceeds what was measured.
   representation effects are large enough to read through seed noise
   (legacy observation at 8 percent fill versus 64 percent); the
   reward-side effects are within plausible single-seed noise and are
-  not claimed as significant.
+  not claimed as significant. The step-cost ablation was confirmed at
+  the full 150M budget (sparse 76 versus step-cost 78 +- 4 percent
+  wins on 10x10), so the dispensability claim does not rest on the
+  short 50M ablation.
 - The generalization headline is two seeds, reported as mean and
   spread. The two seeds agree tightly (per-board win-rate spread at
   or below 5 points except the 24x24 extrapolation tail), so the

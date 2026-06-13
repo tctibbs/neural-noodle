@@ -29,7 +29,15 @@ enabling tighter routes through vacating space.
 The reward-side levers moved little at this budget. Caveats: one
 seed each, and 50M frames may be too early for the step-cost and
 shaping effects to express, since the main run's biggest efficiency
-gains landed after 60M. The win-rate phase change (main hit 30
-percent wins at 70M) is exactly where survival-versus-efficiency
-tension peaks, so a longer sparse-reward ablation remains worth
-running before claiming the step cost is dispensable.
+gains landed after 60M.
+
+Update (150M rerun): the sparse-reward ablation was rerun at the
+full main budget to settle this. On 10x10 it reached steps-per-apple
+9.08, fill 95 percent, win 76 percent, against the step-cost main
+run's 8.94 / 93 percent / 78 percent (+- 4 percent across seeds).
+The step cost is dispensable: efficiency comes from the fruit reward
+and from death ending the future-reward stream, not from the
+per-step penalty. This is the more interesting finding, since it
+means the efficiency result is not an artifact of reward
+engineering. The step cost stays in the main config as a harmless
+mild regularizer, but the headline does not depend on it.
