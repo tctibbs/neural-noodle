@@ -8,8 +8,8 @@ naturally with egocentric observations.
 
 import numpy as np
 
-from snake_rl.config import ActionConfig
-from snake_rl.env.vec_env import VecSnake
+from neural.config import ActionConfig
+from neural.env.vec_env import VecSnake
 
 
 def num_actions(config: ActionConfig) -> int:

@@ -1,7 +1,7 @@
 """Measure the planner oracle and write results to the ledger.
 
 Run with:
-    uv run python -m snake_rl.eval_planner
+    uv run python -m neural.eval_planner
 """
 
 import time
@@ -10,12 +10,12 @@ from typing import Literal
 from loguru import logger
 from pydantic import BaseModel, Field
 
-from snake_rl.config import BoardSpec, config_hash
-from snake_rl.env.vec_env import VecSnake
-from snake_rl.evaluate import aggregate, run_episodes
-from snake_rl.ledger import LedgerRow, append_row
-from snake_rl.logging_setup import setup_logging
-from snake_rl.planner.policies import PlannerPolicy
+from neural.config import BoardSpec, config_hash
+from neural.env.vec_env import VecSnake
+from neural.evaluate import aggregate, run_episodes
+from neural.ledger import LedgerRow, append_row
+from neural.logging_setup import setup_logging
+from neural.planner.policies import PlannerPolicy
 
 
 class PlannerEvalConfig(BaseModel):

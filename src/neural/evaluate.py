@@ -11,8 +11,8 @@ from typing import Protocol
 import numpy as np
 from loguru import logger
 
-from snake_rl.config import BoardSpec, EnvConfig
-from snake_rl.env.vec_env import EpisodeStats, VecSnake
+from neural.config import BoardSpec, EnvConfig
+from neural.env.vec_env import EpisodeStats, VecSnake
 
 
 class Policy(Protocol):

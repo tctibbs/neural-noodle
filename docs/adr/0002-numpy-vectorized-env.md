@@ -15,7 +15,7 @@ Snake anyway), or a single-process numpy env with a batch dimension.
 
 ## Decision
 
-One canonical batched simulator in numpy (snake_rl.env.vec_env), flat
+One canonical batched simulator in numpy (neural.env.vec_env), flat
 arrays over a batch dimension, ring-buffer bodies, occupancy grids,
 and sparse Python loops only for rare events (fruit respawn, resets).
 Absolute directions at the simulator boundary; egocentric action

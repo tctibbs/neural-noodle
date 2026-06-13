@@ -9,8 +9,8 @@ ablations can never change the game rules.
 import numpy as np
 import torch
 
-from snake_rl.config import RewardConfig
-from snake_rl.env.vec_env import StepResult, VecSnake
+from neural.config import RewardConfig
+from neural.env.vec_env import StepResult, VecSnake
 
 
 def potential(env: VecSnake) -> np.ndarray:

@@ -1,7 +1,7 @@
 """Evaluate a saved checkpoint under the fixed protocol.
 
 Run with:
-    uv run python -m snake_rl.eval_ckpt --ckpt runs/<run>/ckpt_final.pt
+    uv run python -m neural.eval_ckpt --ckpt runs/<run>/ckpt_final.pt
 """
 
 import argparse
@@ -11,12 +11,12 @@ from pathlib import Path
 import torch
 from loguru import logger
 
-from snake_rl.agents.rl_policy import RLPolicy
-from snake_rl.config import TrainConfig, config_hash
-from snake_rl.evaluate import aggregate, run_episodes
-from snake_rl.ledger import LedgerRow, append_row
-from snake_rl.logging_setup import setup_logging
-from snake_rl.train import build_network
+from neural.agents.rl_policy import RLPolicy
+from neural.config import TrainConfig, config_hash
+from neural.evaluate import aggregate, run_episodes
+from neural.ledger import LedgerRow, append_row
+from neural.logging_setup import setup_logging
+from neural.train import build_network
 
 
 def main() -> None:

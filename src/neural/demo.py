@@ -12,7 +12,7 @@ outcome, not a mid-episode snapshot. Honest by construction, it shows
 both the strength and the limit.
 
 Run with:
-    uv run python -m snake_rl.demo --ckpt runs/<run>/ckpt_final.pt \
+    uv run python -m neural.demo --ckpt runs/<run>/ckpt_final.pt \
         --boards 8x8,12x12,16x16,20x20 --out docs/demo.gif
 """
 
@@ -25,12 +25,12 @@ import torch
 from matplotlib import font_manager
 from PIL import Image, ImageDraw, ImageFont
 
-from snake_rl.agents.rl_policy import RLPolicy
-from snake_rl.config import BoardSpec, EnvConfig, TrainConfig
-from snake_rl.env.vec_env import VecSnake
-from snake_rl.evaluate import Policy
-from snake_rl.train import build_network
-from snake_rl.video import BG, BODY_NEW, BODY_OLD, FRUIT, GRIDLINE, HEAD
+from neural.agents.rl_policy import RLPolicy
+from neural.config import BoardSpec, EnvConfig, TrainConfig
+from neural.env.vec_env import VecSnake
+from neural.evaluate import Policy
+from neural.train import build_network
+from neural.video import BG, BODY_NEW, BODY_OLD, FRUIT, GRIDLINE, HEAD
 
 MARGIN = 1
 HEADER = 52

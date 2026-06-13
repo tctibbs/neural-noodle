@@ -8,7 +8,7 @@ path, until the starvation cap ends the episode.
 
 import numpy as np
 
-from snake_rl.env.vec_env import DOWN, LEFT, RIGHT, UP, VecSnake
+from neural.env.vec_env import DOWN, LEFT, RIGHT, UP, VecSnake
 
 
 class RandomPolicy:

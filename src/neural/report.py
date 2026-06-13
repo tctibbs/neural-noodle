@@ -1,7 +1,7 @@
 """Markdown results summary from the ledger.
 
 Run with:
-    uv run python -m snake_rl.report
+    uv run python -m neural.report
 """
 
 import argparse
@@ -10,7 +10,7 @@ from pathlib import Path
 
 import numpy as np
 
-from snake_rl.ledger import DEFAULT_LEDGER, LedgerRow, read_rows
+from neural.ledger import DEFAULT_LEDGER, LedgerRow, read_rows
 
 
 def latest_by_key(

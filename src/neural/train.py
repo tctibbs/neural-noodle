@@ -1,7 +1,7 @@
 """PPO training runner.
 
 Run with:
-    uv run python -m snake_rl.train --config configs/main-10x10.yaml
+    uv run python -m neural.train --config configs/main-10x10.yaml
 """
 
 import argparse
@@ -16,22 +16,22 @@ import torch
 from loguru import logger
 from torch.distributions import Categorical
 
-from snake_rl.actions import num_actions, to_absolute
-from snake_rl.agents.network import GridActorCritic, MlpActorCritic
-from snake_rl.agents.rl_policy import RLPolicy
-from snake_rl.config import (
+from neural.actions import num_actions, to_absolute
+from neural.agents.network import GridActorCritic, MlpActorCritic
+from neural.agents.rl_policy import RLPolicy
+from neural.config import (
     TrainConfig,
     config_hash,
     load_config,
     save_config,
 )
-from snake_rl.env.tensor_env import TensorVecSnake
-from snake_rl.env.vec_env import VecSnake
-from snake_rl.evaluate import aggregate, run_episodes
-from snake_rl.ledger import LedgerRow, append_row
-from snake_rl.logging_setup import setup_logging
-from snake_rl.obs import Features9Builder, GridObsBuilder
-from snake_rl.reward import compute_rewards, compute_rewards_t, potential
+from neural.env.tensor_env import TensorVecSnake
+from neural.env.vec_env import VecSnake
+from neural.evaluate import aggregate, run_episodes
+from neural.ledger import LedgerRow, append_row
+from neural.logging_setup import setup_logging
+from neural.obs import Features9Builder, GridObsBuilder
+from neural.reward import compute_rewards, compute_rewards_t, potential
 
 
 def load_dotenv(path: Path = Path(".env")) -> None:

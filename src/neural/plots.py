@@ -1,7 +1,7 @@
 """Learning-curve and oracle-gap plots from the results ledger.
 
 Run with:
-    uv run python -m snake_rl.plots --out plots
+    uv run python -m neural.plots --out plots
 """
 
 import argparse
@@ -14,7 +14,7 @@ mpl.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-from snake_rl.ledger import DEFAULT_LEDGER, LedgerRow, read_rows
+from neural.ledger import DEFAULT_LEDGER, LedgerRow, read_rows
 
 # In-run eval rows measured under the pre-fix canvas convention (see
 # journal/2026-06-12-canvas-ood-bug.md). The ledger keeps them; plots

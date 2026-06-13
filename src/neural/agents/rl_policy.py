@@ -3,10 +3,10 @@
 import numpy as np
 import torch
 
-from snake_rl.actions import to_absolute
-from snake_rl.config import ActionConfig, ObsConfig
-from snake_rl.env.vec_env import VecSnake
-from snake_rl.obs import Features9Builder, GridObsBuilder
+from neural.actions import to_absolute
+from neural.config import ActionConfig, ObsConfig
+from neural.env.vec_env import VecSnake
+from neural.obs import Features9Builder, GridObsBuilder
 
 
 class RLPolicy:

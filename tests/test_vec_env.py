@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from snake_rl.config import BoardSpec, EnvConfig
-from snake_rl.env.vec_env import DOWN, LEFT, RIGHT, UP, VecSnake
+from neural.config import BoardSpec, EnvConfig
+from neural.env.vec_env import DOWN, LEFT, RIGHT, UP, VecSnake
 
 
 def make_env(

@@ -22,6 +22,7 @@ removed; uv.lock is the single source of dependency truth.
 ## Consequences
 
 Anyone reproducing results needs uv, nothing else. CI runs ruff check,
-ruff format --check, ty check, and pytest. The legacy src/neural
-package predates these standards and will be removed rather than
-retrofitted (the learning side is rebuilt in src/snake_rl).
+ruff format --check, ty check, and pytest. The legacy learning package
+predated these standards and was removed rather than retrofitted; the
+learning side was rebuilt from scratch and now lives in src/neural
+(reusing the old package name alongside the src/noodle game).

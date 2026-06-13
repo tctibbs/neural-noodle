@@ -1,7 +1,7 @@
 """Render evaluation episodes of a checkpoint to an mp4.
 
 Run with:
-    uv run python -m snake_rl.video --ckpt runs/<run>/ckpt_final.pt \
+    uv run python -m neural.video --ckpt runs/<run>/ckpt_final.pt \
         --board 10x10 --episodes 3 --out videos/best.mp4
 """
 
@@ -12,12 +12,12 @@ import imageio.v3 as iio
 import numpy as np
 import torch
 
-from snake_rl.agents.rl_policy import RLPolicy
-from snake_rl.config import BoardSpec, EnvConfig, TrainConfig
-from snake_rl.env.vec_env import VecSnake
-from snake_rl.evaluate import Policy
-from snake_rl.planner.policies import PlannerPolicy
-from snake_rl.train import build_network
+from neural.agents.rl_policy import RLPolicy
+from neural.config import BoardSpec, EnvConfig, TrainConfig
+from neural.env.vec_env import VecSnake
+from neural.evaluate import Policy
+from neural.planner.policies import PlannerPolicy
+from neural.train import build_network
 
 CELL = 32
 MARGIN = 2

@@ -16,8 +16,8 @@ from typing import Literal
 
 import numpy as np
 
-from snake_rl.env.vec_env import DELTAS, VecSnake
-from snake_rl.planner.hamiltonian import (
+from neural.env.vec_env import DELTAS, VecSnake
+from neural.planner.hamiltonian import (
     cycle_order,
     hamiltonian_cycle,
     verify_cycle,

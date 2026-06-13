@@ -2,10 +2,10 @@
 
 import pytest
 
-from snake_rl.config import BoardSpec
-from snake_rl.env.vec_env import VecSnake
-from snake_rl.evaluate import aggregate, run_episodes
-from snake_rl.planner.policies import PlannerPolicy
+from neural.config import BoardSpec
+from neural.env.vec_env import VecSnake
+from neural.evaluate import aggregate, run_episodes
+from neural.planner.policies import PlannerPolicy
 
 
 @pytest.mark.parametrize("mode", ["pure", "shortcut"])
@@ -53,7 +53,7 @@ def test_shortcut_not_slower_than_pure() -> None:
 
 def test_planner_rejects_odd_rows() -> None:
     """Odd-height boards are rejected for the planner."""
-    from snake_rl.config import EnvConfig
+    from neural.config import EnvConfig
 
     config = EnvConfig(boards=[BoardSpec(width=8, height=5)], num_envs=1)
     env = VecSnake(config, seed=0)

@@ -66,6 +66,11 @@ ignore = [
     "D107", # Init args are documented in the class docstring.
 ]
 
+[tool.ruff.lint.isort]
+# Pin first-party packages so import grouping is identical in CI and
+# locally, regardless of what is installed in the environment.
+known-first-party = ["neural", "noodle"]
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 

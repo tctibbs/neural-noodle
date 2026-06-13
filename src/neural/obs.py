@@ -14,8 +14,8 @@ nearest obstacle, and a normalized Manhattan fruit distance.
 
 import numpy as np
 
-from snake_rl.config import ObsConfig
-from snake_rl.env.vec_env import DELTAS, VecSnake
+from neural.config import ObsConfig
+from neural.env.vec_env import DELTAS, VecSnake
 
 GRID_CHANNELS = 4
 FEATURES9_DIM = 9

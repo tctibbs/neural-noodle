@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from snake_rl.planner.hamiltonian import (
+from neural.planner.hamiltonian import (
     cycle_order,
     hamiltonian_cycle,
     verify_cycle,

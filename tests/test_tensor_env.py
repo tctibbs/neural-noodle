@@ -4,10 +4,10 @@ import numpy as np
 import pytest
 import torch
 
-from snake_rl.config import BoardSpec, EnvConfig, ObsConfig
-from snake_rl.env.tensor_env import TensorVecSnake
-from snake_rl.env.vec_env import DOWN, LEFT, RIGHT, UP, VecSnake
-from snake_rl.obs import GridObsBuilder
+from neural.config import BoardSpec, EnvConfig, ObsConfig
+from neural.env.tensor_env import TensorVecSnake
+from neural.env.vec_env import DOWN, LEFT, RIGHT, UP, VecSnake
+from neural.obs import GridObsBuilder
 
 
 def make_pair(

@@ -1,7 +1,7 @@
 """Measure the baseline policies and write results to the ledger.
 
 Run with:
-    uv run python -m snake_rl.eval_baselines
+    uv run python -m neural.eval_baselines
 """
 
 import time
@@ -10,12 +10,12 @@ from typing import Literal
 from loguru import logger
 from pydantic import BaseModel, Field
 
-from snake_rl.agents.baselines import LooperPolicy, RandomPolicy
-from snake_rl.config import BoardSpec, config_hash
-from snake_rl.env.vec_env import VecSnake
-from snake_rl.evaluate import Policy, aggregate, run_episodes
-from snake_rl.ledger import LedgerRow, append_row
-from snake_rl.logging_setup import setup_logging
+from neural.agents.baselines import LooperPolicy, RandomPolicy
+from neural.config import BoardSpec, config_hash
+from neural.env.vec_env import VecSnake
+from neural.evaluate import Policy, aggregate, run_episodes
+from neural.ledger import LedgerRow, append_row
+from neural.logging_setup import setup_logging
 
 
 class BaselineEvalConfig(BaseModel):

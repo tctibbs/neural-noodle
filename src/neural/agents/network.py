@@ -8,8 +8,8 @@ policy testable on board geometries it never trained on.
 import torch
 from torch import nn
 
-from snake_rl.config import NetworkConfig
-from snake_rl.obs import FEATURES9_DIM, GRID_CHANNELS
+from neural.config import NetworkConfig
+from neural.obs import FEATURES9_DIM, GRID_CHANNELS
 
 
 class ResidualBlock(nn.Module):

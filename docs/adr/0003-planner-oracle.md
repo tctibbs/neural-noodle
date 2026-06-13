@@ -14,7 +14,7 @@ specification and verified against the quoted table.
 
 ## Decision
 
-snake_rl.planner constructs a boustrophedon Hamiltonian cycle (east
+neural.planner constructs a boustrophedon Hamiltonian cycle (east
 along row 0, snake through the remaining rows in columns 1 and up,
 return north along column 0). Even row counts are required; an
 odd-by-odd grid has no Hamiltonian cycle at all. Every cycle passes a

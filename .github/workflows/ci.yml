@@ -14,10 +14,10 @@ jobs:
       - name: Sync
         run: uv sync
       - name: Ruff lint
-        run: uv run ruff check src/snake_rl tests
+        run: uv run ruff check src/neural tests
       - name: Ruff format
-        run: uv run ruff format --check src/snake_rl tests
+        run: uv run ruff format --check src/neural tests
       - name: Ty
-        run: uv run ty check src/snake_rl
+        run: uv run ty check src/neural
       - name: Tests
         run: uv run pytest tests -q

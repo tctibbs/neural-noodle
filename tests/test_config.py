@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from snake_rl.config import (
+from neural.config import (
     BoardSpec,
     TrainConfig,
     config_hash,

@@ -43,7 +43,7 @@ in [docs/paper](docs/paper); every number traces back to
 
 ## What's in here
 
-- `src/snake_rl`: the main package. Snake simulator (numpy and a GPU
+- `src/neural`: the main package. Snake simulator (numpy and a GPU
   tensor version), the Hamiltonian planner, the PPO agent, the
   evaluation protocol, the results ledger, and plotting and video
   tools.
@@ -62,14 +62,14 @@ Requires [uv](https://docs.astral.sh/uv/).
 ```sh
 uv sync
 uv run pytest tests -q
-uv run python -m snake_rl.eval_planner     # oracle reference numbers
-uv run python -m snake_rl.train --config configs/main-10x10.yaml
-uv run python -m snake_rl.plots --out plots
+uv run python -m neural.eval_planner     # oracle reference numbers
+uv run python -m neural.train --config configs/main-10x10.yaml
+uv run python -m neural.plots --out plots
 ```
 
-Checks: `uv run ruff check src/snake_rl tests`,
-`uv run ruff format --check src/snake_rl tests`,
-`uv run ty check src/snake_rl`.
+Checks: `uv run ruff check src/neural tests`,
+`uv run ruff format --check src/neural tests`,
+`uv run ty check src/neural`.
 
 ## License
 
