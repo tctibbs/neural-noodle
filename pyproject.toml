@@ -78,4 +78,8 @@ convention = "google"
 "**/__init__.py" = ["F401"]
 
 [tool.ty.environment]
-extra-paths = ["src"]
+# Declare the first-party source root so ty resolves the neural and
+# noodle packages from the src layout. Without this, ty resolves
+# first-party imports relative to the project root and cannot find
+# them in CI (the editable-install path hack is invisible to it).
+root = ["./src"]
