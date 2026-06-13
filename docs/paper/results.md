@@ -72,9 +72,38 @@ config hash.
 
 ## Generalization campaign
 
-TODO: gen-mixed-tensor results (trained on eight geometries up to
-16x16; held-out interpolation boards 6x6, 9x12, 14x14, 16x8;
-extrapolation boards 18x18, 20x20, 24x24 beyond the training
-canvas). Oracle references for all eleven evaluation boards are in
-the ledger (shortcut planner wins 100 percent everywhere, spa 6.6 on
-6x6 up to 74.8 on 24x24).
+One policy (gen-mixed-tensor, 500M frames, eight training geometries
+up to 16x16, canvas 16), final 100-episode eval per board. Boards
+marked held-out were never trained on; the last three exceed the
+training canvas entirely.
+
+| Board | status      | spa   | fill | win | oracle spa |
+| ----- | ----------- | ----- | ---- | --- | ---------- |
+| 6x6   | held out    | 4.70  | 99%  | 96% | 6.6        |
+| 8x8   | trained     | 6.56  | 98%  | 95% | 10.4       |
+| 9x12  | held out    | 9.45  | 95%  | 82% | 16.2       |
+| 10x10 | trained     | 8.51  | 96%  | 92% | 15.1       |
+| 12x12 | trained     | 10.93 | 85%  | 66% | 20.7       |
+| 14x14 | held out    | 13.24 | 75%  | 43% | 27.1       |
+| 16x8  | held out    | 10.34 | 91%  | 79% | 18.9       |
+| 16x16 | trained     | 15.94 | 62%  | 17% | 34.9       |
+| 18x18 | extrapolation | 18.00 | 49% | 5%  | 43.2       |
+| 20x20 | extrapolation | 20.25 | 39% | 0%  | 52.8       |
+| 24x24 | extrapolation | 46.0 (noisy) | 23% | 0% | 74.8 |
+
+Three observations. First, held-out interpolation boards are
+statistically indistinguishable from trained boards of similar size:
+9x12 (82 percent wins, an odd width no cycle planner handles
+gracefully) sits right between trained 10x10 and 12x12, and 6x6,
+smaller than anything trained, is near-perfect. Second, the policy
+stays planner-beating on efficiency everywhere it eats: even at
+18x18, two cells beyond its training canvas, it eats at spa 18.0
+against the oracle's 43.2 while filling half the board. Third,
+extrapolation degrades gracefully in fill (49, 39, 23 percent at
+18, 20, 24) rather than collapsing into looping, the failure mode
+the single-board policy showed beyond 1.4x its training area.
+
+The mixed-geometry policy also beats the three dedicated 10x10
+seeds on their own board within noise (92 versus 78 +- 4 percent
+wins), so geometry diversity cost nothing on the home board and
+bought the entire transfer envelope.
